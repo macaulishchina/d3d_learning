@@ -64,45 +64,45 @@ bool GameApp::Init() {
     if (!D3DApp::Init()) return false;
     if (!InitEffect()) return false;
     if (!InitResource()) return false;
+    mMouse->SetWindow(mMainWnd);
+    mMouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
     return true;
 }
 
-void GameApp::OnResize() { D3DApp::OnResize(); }
+void GameApp::OnResize() {
+    D3DApp::OnResize();
+    mVSCPUBuffer.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f));
+}
 
 void GameApp::UpdateScene(float dt) {
-    static float phi = 0.0f, theta = 0.0f, height = 0.0f;
-    // 模型位置
-    const static XMFLOAT3 positions[] = {
-        XMFLOAT3(-2.0f, 0.0f, 0.0f),    //立方体
-        XMFLOAT3(2.0f, 0.0f, 0.0f)      //四棱锥
-    };
+    static float phi = 0.0f, theta = 0.0f;
 
-    phi += 0.0001f, theta += 0.00015f;
+    Mouse::State currMouseState = mMouse->GetState();
+    Mouse::State lastMouseState = mMouseTracker->GetLastState();
+    Keyboard::State currKeyState = mKeyboard->GetState();
+
+
+    mMouseTracker->Update(currMouseState);
+    mKeyboardTracker->Update(currKeyState);
+    bool drag = currMouseState.leftButton && mMouseTracker->leftButton == mMouseTracker->HELD;
+
+    if (drag) {
+        phi -= (currMouseState.y - lastMouseState.y) * 0.01f;
+        theta -= (currMouseState.x - lastMouseState.x) * 0.01f;
+    }
+    if (currKeyState.IsKeyDown(Keyboard::W)) phi += dt * 5;
+    if (currKeyState.IsKeyDown(Keyboard::S)) phi -= dt * 5;
+    if (currKeyState.IsKeyDown(Keyboard::A)) theta += dt * 5;
+    if (currKeyState.IsKeyDown(Keyboard::D)) theta -= dt * 5;
 
     //绘制立方体
-    mVSCPUBuffer.model = XMMatrixTranspose(XMMatrixIdentity() * XMMatrixRotationX(phi) * XMMatrixRotationY(theta) * XMMatrixTranslationFromVector(XMLoadFloat3(positions + 0)));
+    mVSCPUBuffer.model = XMMatrixTranspose(XMMatrixIdentity() * XMMatrixRotationX(phi) * XMMatrixRotationY(theta));
     D3D11_MAPPED_SUBRESOURCE mappedData;
     HR(mD3dImmediateContext->Map(mConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
     memcpy_s(mappedData.pData, sizeof(mVSCPUBuffer), &mVSCPUBuffer, sizeof(mVSCPUBuffer));
     mD3dImmediateContext->Unmap(mConstantBuffer.Get(), 0);
     mD3dImmediateContext->DrawIndexed(36, 0, 0);
 
-    //绘制四棱锥
-    mVSCPUBuffer.model = XMMatrixTranspose(XMMatrixIdentity() * XMMatrixRotationY(theta) * XMMatrixTranslationFromVector(XMLoadFloat3(positions + 1)));
-    //D3D11_MAPPED_SUBRESOURCE mappedData;
-    HR(mD3dImmediateContext->Map(mConstantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(mVSCPUBuffer), &mVSCPUBuffer, sizeof(mVSCPUBuffer));
-    mD3dImmediateContext->Unmap(mConstantBuffer.Get(), 0);
-
-    // 修改顶点
-    HR(mD3dImmediateContext->Map(mVertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-
-    vertices[8] = { XMFLOAT3(0.0f, 2*XMScalarSin(mTimer.TotalTime()) , 0.0f), XMFLOAT4(0.0f, 1.0f, 1.0f, 1.0f) };
-    memcpy_s(mappedData.pData, sizeof(vertices), &vertices, sizeof(vertices));
-    mD3dImmediateContext->Unmap(mVertexBuffer.Get(), 0);
-
-
-    mD3dImmediateContext->DrawIndexed(18, 30, 0);
 }
 
 void GameApp::DrawScene() {
