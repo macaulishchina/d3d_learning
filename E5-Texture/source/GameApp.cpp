@@ -31,17 +31,22 @@ bool GameApp::InitEffect() {
     //创建顶点布局并绑定到顶点着色器(3D)
     HR(mD3dDevice->CreateInputLayout(DT::VertexPosNormalTex::inputLayout, ARRAYSIZE(DT::VertexPosNormalTex::inputLayout),
         blob->GetBufferPointer(), blob->GetBufferSize(), mVertexLayout3D.GetAddressOf()));
-    //#3 编译并创建像素着色器
+    // 编译并创建像素着色器
     HR(CreateShaderFromFile(L"hlsl\\Basic_PS_3D.cso", L"hlsl\\Basic_PS_3D.hlsl", "PS_3D", "ps_5_0", blob.ReleaseAndGetAddressOf()));
     HR(mD3dDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, mPixelShader3D.GetAddressOf()));
+    // 将着色器绑定到渲染管线
+    mD3dImmediateContext->VSSetShader(mVertexShader3D.Get(), nullptr, 0);
+    mD3dImmediateContext->PSSetShader(mPixelShader3D.Get(), nullptr, 0);
+    mD3dImmediateContext->IASetInputLayout(mVertexLayout3D.Get());
+
+    D3D11SetDebugObjectName(mVertexShader3D.Get(), "VS_3D");
+    D3D11SetDebugObjectName(mPixelShader3D.Get(), "PS_3D");
+    D3D11SetDebugObjectName(mVertexLayout3D.Get(), "VertexLayout3D");
 
     return true;
 }
 
 bool GameApp::InitResource() {
-
-    auto meshData = Geometry::CreateBox();
-    assert(ResetMesh(meshData));
 
     // ###设置VS/PS常量缓冲区描述
     D3D11_BUFFER_DESC cbd;
@@ -55,29 +60,51 @@ bool GameApp::InitResource() {
     HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mGPUPSConstBuffer.GetAddressOf()));
     
     // ###初始化纹理和采样器状态
-    // 初始化木箱纹理
-    HR(CreateDDSTextureFromFile(mD3dDevice.Get(), L"..\\Texture\\WoodCrate.dds", nullptr, mWoodCrate.GetAddressOf()));
+
     // 初始化采样器状态
     D3D11_SAMPLER_DESC sampDesc;
     ZeroMemory(&sampDesc, sizeof(sampDesc));
     sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
     sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.BorderColor[0] = 0.0f;
+    sampDesc.BorderColor[1] = 0.0f;
+    sampDesc.BorderColor[2] = 0.0f;
     sampDesc.MinLOD = 0;
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
     HR(mD3dDevice->CreateSamplerState(&sampDesc, mSamplerState.GetAddressOf()));
+    mD3dImmediateContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
 
     // ###初始化光栅化状态
-    //D3D11_RASTERIZER_DESC rasterizerDesc;
-    //ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
-    //rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
-    //rasterizerDesc.CullMode = mCULLRender ? D3D11_CULL_FRONT : D3D11_CULL_NONE;
-    //rasterizerDesc.FrontCounterClockwise = false;
-    //rasterizerDesc.DepthClipEnable = true;
-    //HR(mD3dDevice->CreateRasterizerState(&rasterizerDesc, mRSWireframe.GetAddressOf()));
+    D3D11_RASTERIZER_DESC rasterizerDesc;
+    ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
+    rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+    rasterizerDesc.CullMode = mCULLRender ? D3D11_CULL_FRONT : D3D11_CULL_NONE;
+    rasterizerDesc.FrontCounterClockwise = false;
+    rasterizerDesc.DepthClipEnable = true;
+    HR(mD3dDevice->CreateRasterizerState(&rasterizerDesc, mRSWireframe.GetAddressOf()));
 
+    //设置图元类型，设定输入布局
+    mD3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    mD3dImmediateContext->VSSetConstantBuffers(0, 1, mGPUVSConstBuffer.GetAddressOf());
+    mD3dImmediateContext->PSSetConstantBuffers(1, 1, mGPUPSConstBuffer.GetAddressOf());
+
+
+    // 设置调试对象名
+    D3D11SetDebugObjectName(mGPUVSConstBuffer.Get(), "VSConstantBuffer");
+    D3D11SetDebugObjectName(mGPUPSConstBuffer.Get(), "PSConstantBuffer");
+    D3D11SetDebugObjectName(mSamplerState.Get(), "SamplerState");
+
+    return true;
+}
+
+bool GameApp::InitScene() {
+    auto meshData = Geometry::CreateBox();
+    ResetMesh(meshData);
+    
     //###初始化VS/PS常量缓冲区的值
     //初始化顶点常量缓冲区变量
     mVSCPUBuffer.model = XMMatrixIdentity();
@@ -115,46 +142,20 @@ bool GameApp::InitResource() {
     // 初始化用于PS的常量缓冲区的值
     mPSCPUBUffer.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
     mPSCPUBUffer.material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-    mPSCPUBUffer.material.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 5.0f);
+    mPSCPUBUffer.material.specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 5.0f);
+    // 设置各类光源数量
+    mPSCPUBUffer.numDirLight = 1;
+    mPSCPUBUffer.numPointLight = 1;
+    mPSCPUBUffer.numSpotLight = 1;
 
     mPSCPUBUffer.eyePos = XMFLOAT4(0.0f, 0.0f, -5.0f, 0.0f);
 
-    // 更新PS常量缓冲区资源
-    D3D11_MAPPED_SUBRESOURCE mappedData;
-    HR(mD3dImmediateContext->Map(mGPUPSConstBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::PSConstantBuffer), &mPSCPUBUffer, sizeof(DT::PSConstantBuffer));
-    mD3dImmediateContext->Unmap(mGPUPSConstBuffer.Get(), 0);
-
-    //设置图元类型，设定输入布局
-    mD3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    mD3dImmediateContext->IASetInputLayout(mVertexLayout3D.Get());
-    //将着色器绑定到渲染管线
-    mD3dImmediateContext->VSSetShader(mVertexShader3D.Get(), nullptr, 0);
-    mD3dImmediateContext->PSSetShader(mPixelShader3D.Get(), nullptr, 0);
-    mD3dImmediateContext->VSSetConstantBuffers(0, 1, mGPUVSConstBuffer.GetAddressOf());
-    mD3dImmediateContext->PSSetConstantBuffers(1, 1, mGPUPSConstBuffer.GetAddressOf());
+    // 初始化木箱纹理
+    HR(CreateDDSTextureFromFile(mD3dDevice.Get(), L"..\\Texture\\flare.dds", nullptr, mWoodCrate.GetAddressOf()));
     // 像素着色阶段设置好采样器
-    mD3dImmediateContext->PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
     mD3dImmediateContext->PSSetShaderResources(0, 1, mWoodCrate.GetAddressOf());
-
-    // 设置调试对象名
-    D3D11SetDebugObjectName(mVertexLayout3D.Get(), "VertexLayout3D");
-    D3D11SetDebugObjectName(mGPUVSConstBuffer.Get(), "VSConstantBuffer");
-    D3D11SetDebugObjectName(mGPUPSConstBuffer.Get(), "PSConstantBuffer");
-    D3D11SetDebugObjectName(mVertexShader3D.Get(), "VS_3D");
-    D3D11SetDebugObjectName(mPixelShader3D.Get(), "PS_3D");
-    D3D11SetDebugObjectName(mSamplerState.Get(), "SamplerState");
-
-    return true;
-}
-
-bool GameApp::InitScene() {
-    mD3dImmediateContext->IASetInputLayout(mVertexLayout3D.Get());
-    auto meshData = Geometry::CreateBox();
-    ResetMesh(meshData);
-    mD3dImmediateContext->VSSetShader(mVertexShader3D.Get(), nullptr, 0);
-    mD3dImmediateContext->PSSetShader(mPixelShader3D.Get(), nullptr, 0);
-    mD3dImmediateContext->PSSetShaderResources(0, 1, mWoodCrate.GetAddressOf());
+    HR(CreateDDSTextureFromFile(mD3dDevice.Get(), L"..\\Texture\\flarealpha.dds", nullptr, mWoodCrate.GetAddressOf()));
+    mD3dImmediateContext->PSSetShaderResources(1, 1, mWoodCrate.GetAddressOf());
 
     return true;
 }
@@ -178,7 +179,7 @@ void GameApp::UpdateScene(float dt) {
     XMMATRIX M = XMMatrixRotationX(phi) * XMMatrixRotationY(theta);
     mVSCPUBuffer.model = XMMatrixTranspose(M);
     mVSCPUBuffer.adjustNormal = XMMatrixInverse(nullptr, M);
-
+    mVSCPUBuffer.texTransform = XMMatrixRotationZ(10*(phi+theta));
     // 键盘切换光栅化状态
     if (mKeyboardTracker->IsKeyReleased(Keyboard::S)) {
         mIsWireframeMode = !mIsWireframeMode;
@@ -194,6 +195,18 @@ void GameApp::UpdateScene(float dt) {
     memcpy_s(mappedData.pData, sizeof(DT::PSConstantBuffer), &mPSCPUBUffer, sizeof(DT::PSConstantBuffer));
     mD3dImmediateContext->Unmap(mGPUPSConstBuffer.Get(), 0);
 
+    //const wchar_t* ColorsTexture[6] = { 
+    //    L"..\\Texture\\Yellow.dds",
+    //    L"..\\Texture\\Blue.dds",
+    //    L"..\\Texture\\Green.dds",
+    //    L"..\\Texture\\Orange.dds",
+    //    L"..\\Texture\\Red.dds",
+    //    L"..\\Texture\\White.dds" };
+    //for (int i = 1; i <= 6; i++) {
+    //    HR(CreateDDSTextureFromFile(mD3dDevice.Get(), ColorsTexture[i-1], nullptr, mWoodCrate.GetAddressOf()));
+    //    mD3dImmediateContext->PSSetShaderResources(0, 1, mWoodCrate.GetAddressOf());
+    //    mD3dImmediateContext->DrawIndexed(6, (i-1)*6, 0);
+    //}
     mD3dImmediateContext->DrawIndexed(mIndexCount, 0, 0);
     mMouseTracker->Update(currMouseState);
     mKeyboardTracker->Update(currKeyState);
