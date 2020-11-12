@@ -114,7 +114,24 @@ void GameApp::DrawScene() {
     mD3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), bg);
     mD3dImmediateContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     UpdateScene(mTimer.DeltaTime());
+    Update2DScene();
     HR(mSwapChain->Present(0, 0));
+}
+
+void GameApp::Update2DScene() {
+    if (mD2dRenderTarget != nullptr) {
+        mD2dRenderTarget->BeginDraw();
+        std::wstring textStr = L"切换灯光类型: 1-平行光 2-点光 3-聚光灯\n"
+            L"切换模型: Q-立方体 W-球体 E-圆柱体 R-圆锥体\n"
+            L"S-切换模式 当前模式: ";
+        if (mIsWireframeMode)
+            textStr += L"线框模式";
+        else
+            textStr += L"面模式";
+        mD2dRenderTarget->DrawTextW(textStr.c_str(), (UINT32)textStr.size(), mTextFormat.Get(),
+            D2D1_RECT_F{ 0.0f, 0.0f, 600.0f, 200.0f }, mColorBrush.Get());
+        HR(mD2dRenderTarget->EndDraw());
+    }
 }
 
 bool GameApp::InitEffect() {
@@ -184,7 +201,7 @@ bool GameApp::InitResource() {
     // 初始化用于PS的常量缓冲区的值
     mPSCPUBUffer.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
     mPSCPUBUffer.material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-    mPSCPUBUffer.material.specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 5.0f);
+    mPSCPUBUffer.material.specular = XMFLOAT4(1.0f, 0.0f, 0.0f, 5.0f);
     mPSCPUBUffer.dirLight = mDirLight;
     mPSCPUBUffer.eyePos = XMFLOAT4(0.0f, 0.0f, -5.0f, 0.0f);
 

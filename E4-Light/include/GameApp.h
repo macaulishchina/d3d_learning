@@ -13,6 +13,7 @@ public:
     void OnResize();
     void UpdateScene(float dt);
     void DrawScene();
+    void Update2DScene();
 
 private:
     bool InitEffect();

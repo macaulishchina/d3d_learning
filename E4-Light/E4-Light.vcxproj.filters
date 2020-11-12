@@ -82,7 +82,11 @@
     <None Include="hlsl\LightHelper.hlsli">
       <Filter>着色器</Filter>
     </None>
-    <None Include="hlsl\PS.hlsl" />
-    <None Include="hlsl\VS.hlsl" />
+    <None Include="hlsl\PS.hlsl">
+      <Filter>着色器</Filter>
+    </None>
+    <None Include="hlsl\VS.hlsl">
+      <Filter>着色器</Filter>
+    </None>
   </ItemGroup>
 </Project>

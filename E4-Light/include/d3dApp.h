@@ -1,6 +1,8 @@
 #ifndef D3DAPP_H
 #define D3DAPP_H
 
+#include <d2d1.h>
+#include <dwrite.h>
 #include <wrl/client.h>
 #include <string>
 #include <d3d11_1.h>
@@ -10,6 +12,8 @@
 #include "Keyboard.h"
 
 // 添加所有要引用的库
+#pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -36,6 +40,7 @@ public:
 	// 窗口的消息回调函数
 protected:
 	bool InitMainWindow();       // 窗口初始化
+	bool InitDirect2D();         // Direct2D初始化
 	bool InitDirect3D();         // Direct3D初始化
 
 	void CalculateFrameStats();  // 计算每秒帧数并在窗口显示
@@ -60,6 +65,14 @@ protected:
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 	// 光栅化状态: 线框模式
 	ComPtr<ID3D11RasterizerState> mRSWireframe;
+	// Direct2D
+	ComPtr<ID2D1Factory> mD2dFactory;					// D2D工厂
+	ComPtr<ID2D1RenderTarget> mD2dRenderTarget;			// D2D渲染目标
+	ComPtr<IDWriteFactory> mDwriteFactory;				// DWrite工厂
+	// 字体样式
+	ComPtr<ID2D1SolidColorBrush> mColorBrush;			// 单色笔刷
+	ComPtr<IDWriteFont> mFont;							// 字体
+	ComPtr<IDWriteTextFormat> mTextFormat;				// 文本格式
 	// Direct3D 11
 	ComPtr<ID3D11Device> mD3dDevice;                    // D3D11设备
 	ComPtr<ID3D11DeviceContext> mD3dImmediateContext;   // D3D11设备上下文
