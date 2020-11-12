@@ -101,9 +101,6 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
-    <PreBuildEvent>
-      <Command>DEL $(ProjectDir)hlsl\*.cso</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -128,9 +125,6 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
-    <PreBuildEvent>
-      <Command>DEL $(ProjectDir)hlsl\*.cso</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -151,9 +145,6 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
-    <PreBuildEvent>
-      <Command>DEL $(ProjectDir)hlsl\*.cso</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -178,9 +169,6 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
-    <PreBuildEvent>
-      <Command>DEL $(ProjectDir)hlsl\*.cso</Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\d3dApp.h" />

@@ -40,9 +40,9 @@ float4 PS_3D(VertexHWPosNorTex pIn) : SV_Target
         diffuse += D;
         spec += S;
     }
+
     float4 texColor = gTexture.Sample(gSamplerState, pIn.texTure);
-    float4 texColor1 = gTexture1.Sample(gSamplerState, pIn.texTure);
-    float4 litColor = texColor * texColor1 * (ambient + diffuse) + spec;
+    float4 litColor = texColor * (ambient + diffuse) + spec;
     litColor.a = texColor.a * gMaterial.diffuse.a;
 	
     return litColor;

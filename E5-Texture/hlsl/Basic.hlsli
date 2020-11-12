@@ -1,7 +1,6 @@
 #include "LightHelper.hlsli"
 
 Texture2D gTexture : register(t0);
-Texture2D gTexture1 : register(t1);
 SamplerState gSamplerState : register(s0);
 
 cbuffer VSConstantBuffer : register(b0)
@@ -10,7 +9,6 @@ cbuffer VSConstantBuffer : register(b0)
     matrix gView;
     matrix gProj;
     matrix gAdjustNormal;   //用于矫正法向量的矩阵
-    matrix gTexTransform;    //用于纹理坐标的变换
 }
 
 cbuffer PSConstantBuffer : register(b1)

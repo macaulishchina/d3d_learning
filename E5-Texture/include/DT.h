@@ -256,7 +256,6 @@ namespace DT {
         DirectX::XMMATRIX view;
         DirectX::XMMATRIX proj;
         DirectX::XMMATRIX adjustNormal;
-        DirectX::XMMATRIX texTransform;
     };
 
     struct PSConstantBuffer {
