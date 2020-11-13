@@ -1,35 +1,54 @@
 #include "LightHelper.hlsli"
 
 Texture2D gTexture : register(t0);
-Texture2D gTexture1 : register(t1);
 SamplerState gSamplerState : register(s0);
 
-cbuffer VSConstantBuffer : register(b0)
+//模型相关常量
+cbuffer ModelLocationBuffer : register(b0)
 {
     matrix gModel;
+    matrix gAdjustNormal; //用于矫正法向量的矩阵
+}
+
+//视角相关常量
+cbuffer CameraBuffer : register(b1)
+{
     matrix gView;
     matrix gProj;
-    matrix gAdjustNormal;   //用于矫正法向量的矩阵
+    float3 gEyePosW;
+    float padding1;
 }
 
-cbuffer VSConstantBuffer : register(b1)
+//材质线管常量
+cbuffer MaterialBuffer : register(b2)
 {
-    matrix gTexTransform;    //用于纹理坐标的变换
+    Material gMaterial;
 }
 
-
-cbuffer PSConstantBuffer : register(b2)
+//平行光相关常量
+cbuffer DirLightBuffer : register(b3)
 {
     DirectionalLight gDirLight[10];
-    PointLight gPointLight[10];
-    SpotLight gSpotLight[10];
-    Material gMaterial;
-    float3 gEyePosW;
-    float gPadding1;
     int gNumDirLight;
+    float3 padding2;
+
+}
+
+//点光源相关常量
+cbuffer PointLightBuffer : register(b4)
+{
+    PointLight gPointLight[10];
     int gNumPointLight;
+    float3 padding3;
+}
+
+//聚光灯相关常量
+cbuffer SpotLightBuffer : register(b5)
+{
+    SpotLight gSpotLight[10];
     int gNumSpotLight;
-    float gPadding2;
+    float3 padding4;
+
 }
 
 struct VertexPosNorTex

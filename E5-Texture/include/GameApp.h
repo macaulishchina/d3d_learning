@@ -26,6 +26,7 @@ private:
     ComPtr<ID3D11Buffer> mGPUVertexBuffer;          // 顶点缓冲区
     ComPtr<ID3D11Buffer> mGPUIndexBuffer;			// 索引缓冲区
     ComPtr<ID3D11Buffer> mGPUVSConstBuffer;	        // VS常量缓冲区
+    ComPtr<ID3D11Buffer> mGPUVSConstBuffer2;	    // VS常量缓冲区
     ComPtr<ID3D11Buffer> mGPUPSConstBuffer;	        // PS常量缓冲区
     UINT mIndexCount;                               // 索引量
 
@@ -37,6 +38,8 @@ private:
     ComPtr<ID3D11PixelShader> mPixelShader3D;       // 3D像素着色器
 
     DT::VSConstantBuffer mVSCPUBuffer;	            // 顶点着色器关联变量
+    DT::VSConstantBuffer2 mVSCPUBuffer2;	            // 顶点着色器关联变量
+
     DT::PSConstantBuffer mPSCPUBUffer;              // 像素着色器关联变量
 
 };

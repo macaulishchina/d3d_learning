@@ -251,27 +251,38 @@ namespace DT {
         DirectX::XMFLOAT4 reflect;
     };
 
-    struct VSConstantBuffer {
+
+    struct ModelLocationBuffer {
         DirectX::XMMATRIX model;
-        DirectX::XMMATRIX view;
-        DirectX::XMMATRIX proj;
         DirectX::XMMATRIX adjustNormal;
     };
 
-    struct VSConstantBuffer2 {
-        DirectX::XMMATRIX texTransform;
+    struct CameraBuffer {
+        DirectX::XMMATRIX view;
+        DirectX::XMMATRIX proj;
+        DirectX::XMFLOAT4 eyePos;
     };
 
-    struct PSConstantBuffer {
-        DirectionalLight dirLight[10];
-        PointLight pointLight[10];
-        SpotLight spotLight[10];
+    struct MaterialBuffer {
         Material material;
-        DirectX::XMFLOAT4 eyePos;
+    };
+
+    struct DirLightBuffer {
+        DirectionalLight dirLight[10];
         int numDirLight;
+        int padding[3];
+    };
+
+    struct PointLightBuffer {
+        PointLight pointLight[10];
         int numPointLight;
+        int padding[3];
+    };
+
+    struct SpotLightBuffer {
+        SpotLight spotLight[10];
         int numSpotLight;
-        float gPadding;
+        int padding[3];
     };
 }
 

@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E4-Light", "E4-Light\E4-Lig
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E5-Texture", "E5-Texture\E5-Texture.vcxproj", "{E405F049-2AC2-429D-A990-BD2B3B3968CC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "E6-Camera", "E6-Camera\E6-Camera.vcxproj", "{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,14 @@ Global
 		{E405F049-2AC2-429D-A990-BD2B3B3968CC}.Release|x64.Build.0 = Release|x64
 		{E405F049-2AC2-429D-A990-BD2B3B3968CC}.Release|x86.ActiveCfg = Release|Win32
 		{E405F049-2AC2-429D-A990-BD2B3B3968CC}.Release|x86.Build.0 = Release|Win32
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Debug|x64.ActiveCfg = Debug|x64
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Debug|x64.Build.0 = Debug|x64
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Debug|x86.ActiveCfg = Debug|Win32
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Debug|x86.Build.0 = Debug|Win32
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Release|x64.ActiveCfg = Release|x64
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Release|x64.Build.0 = Release|x64
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Release|x86.ActiveCfg = Release|Win32
+		{D36A25EE-C6F7-444E-B578-7D34DD0AFAB4}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
