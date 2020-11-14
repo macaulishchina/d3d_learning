@@ -1,10 +1,8 @@
 #ifndef GAMEAPP_H
 #define GAMEAPP_H
 
-#include "DT.h"
 #include "d3dApp.h"
-#include "Resource.h"
-
+#include "DT.h"
 #define CONST_BUFFER_NUMS 6
 class GameApp : public D3DApp {
 public:
@@ -37,8 +35,6 @@ private:
 
     ComPtr<ID3D11VertexShader> mVertexShader3D;     // 3D顶点输入布局
     ComPtr<ID3D11PixelShader> mPixelShader3D;       // 3D像素着色器
-
-    ResourceController mController;
 
     DT::CBModelLocation mModelBuffer;	    // 模型位置相关量
     DT::CBCamera mCameraBuffer;	            // 视角相关量

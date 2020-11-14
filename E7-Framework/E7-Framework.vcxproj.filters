@@ -14,24 +14,8 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="着色器">
-      <UniqueIdentifier>{40b11035-5a61-40a6-b7c0-9c9d5ecbe35e}</UniqueIdentifier>
+      <UniqueIdentifier>{d9a211f4-3187-4405-b403-2622a7739d98}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="hlsl\Basic.hlsli">
-      <Filter>着色器</Filter>
-    </None>
-    <None Include="hlsl\LightHelper.hlsli">
-      <Filter>着色器</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="hlsl\Basic_PS_3D.hlsl">
-      <Filter>着色器</Filter>
-    </FxCompile>
-    <FxCompile Include="hlsl\Basic_VS_3D.hlsl">
-      <Filter>着色器</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h">
@@ -70,12 +54,15 @@
     <ClInclude Include="include\WICTextureLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\Resource.h">
+    <ClInclude Include="include\Control2.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Control.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\d3dApp.cpp">
@@ -111,8 +98,21 @@
     <ClCompile Include="source\WICTextureLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Resource.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="hlsl\Basic.hlsli">
+      <Filter>着色器</Filter>
+    </None>
+    <None Include="hlsl\LightHelper.hlsli">
+      <Filter>着色器</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="hlsl\Basic_PS_3D.hlsl">
+      <Filter>着色器</Filter>
+    </FxCompile>
+    <FxCompile Include="hlsl\Basic_VS_3D.hlsl">
+      <Filter>着色器</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

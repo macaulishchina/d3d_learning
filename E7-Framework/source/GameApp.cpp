@@ -14,8 +14,7 @@ GameApp::GameApp(HINSTANCE hInstance) :
     mDirLightBuffer(),
     mPointLightBuffer(),
     mSpotLightBuffer(),
-    mIndexCount(0),
-    mController(this){
+    mIndexCount(0) {
 }
 
 GameApp::~GameApp() {}
@@ -53,26 +52,25 @@ bool GameApp::InitEffect() {
 
 bool GameApp::InitResource() {
 
-    mController.InitBuffer();
-    //// ###设置VS/PS常量缓冲区描述
-    //D3D11_BUFFER_DESC cbd;
-    //ZeroMemory(&cbd, sizeof(cbd));
-    //cbd.Usage = D3D11_USAGE_DYNAMIC;
-    //cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    //cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    ////创建变量缓冲区
-    //cbd.ByteWidth = sizeof(DT::CBModelLocation);
-    //HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[0].GetAddressOf()));
-    //cbd.ByteWidth = sizeof(DT::CBCamera);
-    //HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[1].GetAddressOf()));
-    //cbd.ByteWidth = sizeof(DT::CBMaterial);
-    //HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[2].GetAddressOf()));
-    //cbd.ByteWidth = sizeof(DT::CBDirLight);
-    //HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[3].GetAddressOf()));
-    //cbd.ByteWidth = sizeof(DT::CBPointLight);
-    //HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[4].GetAddressOf()));
-    //cbd.ByteWidth = sizeof(DT::CBSpotLight);
-    //HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[5].GetAddressOf()));
+    // ###设置VS/PS常量缓冲区描述
+    D3D11_BUFFER_DESC cbd;
+    ZeroMemory(&cbd, sizeof(cbd));
+    cbd.Usage = D3D11_USAGE_DYNAMIC;
+    cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    //创建变量缓冲区
+    cbd.ByteWidth = sizeof(DT::CBModelLocation);
+    HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[0].GetAddressOf()));
+    cbd.ByteWidth = sizeof(DT::CBCamera);
+    HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[1].GetAddressOf()));
+    cbd.ByteWidth = sizeof(DT::CBMaterial);
+    HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[2].GetAddressOf()));
+    cbd.ByteWidth = sizeof(DT::CBDirLight);
+    HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[3].GetAddressOf()));
+    cbd.ByteWidth = sizeof(DT::CBPointLight);
+    HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[4].GetAddressOf()));
+    cbd.ByteWidth = sizeof(DT::CBSpotLight);
+    HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[5].GetAddressOf()));
 
     // ###初始化纹理和采样器状态
     // 初始化采样器状态
@@ -103,29 +101,29 @@ bool GameApp::InitResource() {
     // 设置图元类型，设定输入布局
     mD3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    //std::cout << D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT << std::endl;
-    //// 绑定缓存到对应寄存器
-    //mD3dImmediateContext->VSSetConstantBuffers(0, 1, mConstBuffers[0].GetAddressOf());
-    //mD3dImmediateContext->VSSetConstantBuffers(1, 1, mConstBuffers[1].GetAddressOf());
-    //mD3dImmediateContext->VSSetConstantBuffers(2, 1, mConstBuffers[2].GetAddressOf());
-    //mD3dImmediateContext->VSSetConstantBuffers(3, 1, mConstBuffers[3].GetAddressOf());
-    //mD3dImmediateContext->VSSetConstantBuffers(4, 1, mConstBuffers[4].GetAddressOf());
-    //mD3dImmediateContext->VSSetConstantBuffers(5, 1, mConstBuffers[5].GetAddressOf());
+    std::cout << D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT << std::endl;
+    // 绑定缓存到对应寄存器
+    mD3dImmediateContext->VSSetConstantBuffers(0, 1, mConstBuffers[0].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(1, 1, mConstBuffers[1].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(2, 1, mConstBuffers[2].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(3, 1, mConstBuffers[3].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(4, 1, mConstBuffers[4].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(5, 1, mConstBuffers[5].GetAddressOf());
 
-    //mD3dImmediateContext->PSSetConstantBuffers(0, 1, mConstBuffers[0].GetAddressOf());
-    //mD3dImmediateContext->PSSetConstantBuffers(1, 1, mConstBuffers[1].GetAddressOf());
-    //mD3dImmediateContext->PSSetConstantBuffers(2, 1, mConstBuffers[2].GetAddressOf());
-    //mD3dImmediateContext->PSSetConstantBuffers(3, 1, mConstBuffers[3].GetAddressOf());
-    //mD3dImmediateContext->PSSetConstantBuffers(4, 1, mConstBuffers[4].GetAddressOf());
-    //mD3dImmediateContext->PSSetConstantBuffers(5, 1, mConstBuffers[5].GetAddressOf());
+    mD3dImmediateContext->PSSetConstantBuffers(0, 1, mConstBuffers[0].GetAddressOf());
+    mD3dImmediateContext->PSSetConstantBuffers(1, 1, mConstBuffers[1].GetAddressOf());
+    mD3dImmediateContext->PSSetConstantBuffers(2, 1, mConstBuffers[2].GetAddressOf());
+    mD3dImmediateContext->PSSetConstantBuffers(3, 1, mConstBuffers[3].GetAddressOf());
+    mD3dImmediateContext->PSSetConstantBuffers(4, 1, mConstBuffers[4].GetAddressOf());
+    mD3dImmediateContext->PSSetConstantBuffers(5, 1, mConstBuffers[5].GetAddressOf());
 
     // 设置调试对象名
-    //D3D11SetDebugObjectName(mConstBuffers[0].Get(), "VSModelLocationBuffer");
-    //D3D11SetDebugObjectName(mConstBuffers[1].Get(), "VSCameraBuffer");
-    //D3D11SetDebugObjectName(mConstBuffers[2].Get(), "VSMaterialBuffer");
-    //D3D11SetDebugObjectName(mConstBuffers[3].Get(), "PSDirLightBuffer");
-    //D3D11SetDebugObjectName(mConstBuffers[4].Get(), "PSPointLightBuffer");
-    //D3D11SetDebugObjectName(mConstBuffers[5].Get(), "PSSpotLightBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[0].Get(), "VSModelLocationBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[1].Get(), "VSCameraBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[2].Get(), "VSMaterialBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[3].Get(), "PSDirLightBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[4].Get(), "PSPointLightBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[5].Get(), "PSSpotLightBuffer");
     D3D11SetDebugObjectName(mSamplerState.Get(), "SamplerState");
 
     return true;
@@ -147,38 +145,38 @@ bool GameApp::InitScene() {
     mCameraBuffer.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f));
     mCameraBuffer.eyePos = XMFLOAT3(0.0f, 0.0f, -5.0f);
 
-    //// 初始化默认光照
-    //// 方向光
-    //mDirLightBuffer.dirLight[0].ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-    //mDirLightBuffer.dirLight[0].diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-    //mDirLightBuffer.dirLight[0].specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-    //mDirLightBuffer.dirLight[0].direction = XMFLOAT3(-0.577f, -0.577f, 0.577f);
-    //// 点光
-    //mPointLightBuffer.pointLight[0].position = XMFLOAT3(0.0f, 0.0f, -10.0f);
-    //mPointLightBuffer.pointLight[0].ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-    //mPointLightBuffer.pointLight[0].diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
-    //mPointLightBuffer.pointLight[0].specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-    //mPointLightBuffer.pointLight[0].att = XMFLOAT3(0.0f, 0.1f, 0.0f);
-    //mPointLightBuffer.pointLight[0].range = 25.0f;
-    //// 聚光灯
-    //mSpotLightBuffer.spotLight[0].position = XMFLOAT3(0.0f, 0.0f, -5.0f);
-    //mSpotLightBuffer.spotLight[0].direction = XMFLOAT3(0.0f, 0.0f, 1.0f);
-    //mSpotLightBuffer.spotLight[0].ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-    //mSpotLightBuffer.spotLight[0].diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-    //mSpotLightBuffer.spotLight[0].specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-    //mSpotLightBuffer.spotLight[0].att = XMFLOAT3(1.0f, 0.0f, 0.0f);
-    //mSpotLightBuffer.spotLight[0].spot = 12.0f;
-    //mSpotLightBuffer.spotLight[0].range = 10000.0f;
+    // 初始化默认光照
+    // 方向光
+    mDirLightBuffer.dirLight[0].ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+    mDirLightBuffer.dirLight[0].diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+    mDirLightBuffer.dirLight[0].specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    mDirLightBuffer.dirLight[0].direction = XMFLOAT3(-0.577f, -0.577f, 0.577f);
+    // 点光
+    mPointLightBuffer.pointLight[0].position = XMFLOAT3(0.0f, 0.0f, -10.0f);
+    mPointLightBuffer.pointLight[0].ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
+    mPointLightBuffer.pointLight[0].diffuse = XMFLOAT4(0.7f, 0.7f, 0.7f, 1.0f);
+    mPointLightBuffer.pointLight[0].specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    mPointLightBuffer.pointLight[0].att = XMFLOAT3(0.0f, 0.1f, 0.0f);
+    mPointLightBuffer.pointLight[0].range = 25.0f;
+    // 聚光灯
+    mSpotLightBuffer.spotLight[0].position = XMFLOAT3(0.0f, 0.0f, -5.0f);
+    mSpotLightBuffer.spotLight[0].direction = XMFLOAT3(0.0f, 0.0f, 1.0f);
+    mSpotLightBuffer.spotLight[0].ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+    mSpotLightBuffer.spotLight[0].diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    mSpotLightBuffer.spotLight[0].specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    mSpotLightBuffer.spotLight[0].att = XMFLOAT3(1.0f, 0.0f, 0.0f);
+    mSpotLightBuffer.spotLight[0].spot = 12.0f;
+    mSpotLightBuffer.spotLight[0].range = 10000.0f;
 
-    //// 初始化用于PS的常量缓冲区的值
-    //mMaterialBuffer.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-    //mMaterialBuffer.material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-    //mMaterialBuffer.material.specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 5.0f);
+    // 初始化用于PS的常量缓冲区的值
+    mMaterialBuffer.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    mMaterialBuffer.material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    mMaterialBuffer.material.specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 5.0f);
 
-    //// 设置各类光源数量
-    //mDirLightBuffer.numDirLight = 1;
-    //mPointLightBuffer.numPointLight = 1;
-    //mSpotLightBuffer.numSpotLight = 1;
+    // 设置各类光源数量
+    mDirLightBuffer.numDirLight = 1;
+    mPointLightBuffer.numPointLight = 1;
+    mSpotLightBuffer.numSpotLight = 1;
 
 
     // 初始化木箱纹理
@@ -214,10 +212,8 @@ void GameApp::UpdateScene(float dt) {
         mIsWireframeMode = !mIsWireframeMode;
         mD3dImmediateContext->RSSetState(mIsWireframeMode ? mRSWireframe.Get() : nullptr);
     }
-    mController.setModel(M);
-    mController.update();
 
-    /*D3D11_MAPPED_SUBRESOURCE mappedData;
+    D3D11_MAPPED_SUBRESOURCE mappedData;
     HR(mD3dImmediateContext->Map(mConstBuffers[0].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
     memcpy_s(mappedData.pData, sizeof(DT::CBModelLocation), &mModelBuffer, sizeof(DT::CBModelLocation));
     mD3dImmediateContext->Unmap(mConstBuffers[0].Get(), 0);
@@ -240,7 +236,7 @@ void GameApp::UpdateScene(float dt) {
 
     HR(mD3dImmediateContext->Map(mConstBuffers[5].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
     memcpy_s(mappedData.pData, sizeof(DT::CBSpotLight), &mSpotLightBuffer, sizeof(DT::CBSpotLight));
-    mD3dImmediateContext->Unmap(mConstBuffers[5].Get(), 0);*/
+    mD3dImmediateContext->Unmap(mConstBuffers[5].Get(), 0);
 
     mD3dImmediateContext->DrawIndexed(mIndexCount, 0, 0);
     mMouseTracker->Update(currMouseState);

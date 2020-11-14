@@ -61,7 +61,7 @@ protected:
 
 	GameTimer mTimer;           // 计时器
 
-	friend class ResourceController;
+	//friend class ResourceController;
 
 	// 使用模板别名(C++11)简化类型名
 	template <class T>
