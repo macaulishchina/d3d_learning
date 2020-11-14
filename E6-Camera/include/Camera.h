@@ -3,107 +3,11 @@
 #include <DirectXMath.h>
 #include <d3d11_1.h>
 #include <DirectXMath.h>
+#include "Transform.h"
 
-namespace CameraInternal {
-    class Transform {
-    public:
-        Transform() = default;
-        Transform(const DirectX::XMFLOAT3& scale, const DirectX::XMFLOAT3& rotation, const DirectX::XMFLOAT3& position);
-        ~Transform() = default;
-
-        Transform(const Transform&) = default;
-        Transform& operator=(const Transform&) = default;
-
-        Transform(Transform&&) = default;
-        Transform& operator=(Transform&&) = default;
-
-        // 获取对象缩放比例
-        DirectX::XMFLOAT3 GetScale() const;
-        // 获取对象缩放比例
-        DirectX::XMVECTOR GetScaleXM() const;
-
-        // 获取对象欧拉角(弧度制)
-        // 对象以Z-X-Y轴顺序旋转
-        DirectX::XMFLOAT3 GetRotation() const;
-        // 获取对象欧拉角(弧度制)
-        // 对象以Z-X-Y轴顺序旋转
-        DirectX::XMVECTOR GetRotationXM() const;
-
-        // 获取对象位置
-        DirectX::XMFLOAT3 GetPosition() const;
-        // 获取对象位置
-        DirectX::XMVECTOR GetPositionXM() const;
-
-        // 获取右方向轴
-        DirectX::XMFLOAT3 GetRightAxis() const;
-        // 获取右方向轴
-        DirectX::XMVECTOR GetRightAxisXM() const;
-
-        // 获取上方向轴
-        DirectX::XMFLOAT3 GetUpAxis() const;
-        // 获取上方向轴
-        DirectX::XMVECTOR GetUpAxisXM() const;
-
-        // 获取前方向轴
-        DirectX::XMFLOAT3 GetForwardAxis() const;
-        // 获取前方向轴
-        DirectX::XMVECTOR GetForwardAxisXM() const;
-
-        // 获取世界变换矩阵
-        DirectX::XMFLOAT4X4 GetLocalToWorldMatrix() const;
-        // 获取世界变换矩阵
-        DirectX::XMMATRIX GetLocalToWorldMatrixXM() const;
-
-        // 获取逆世界变换矩阵
-        DirectX::XMFLOAT4X4 GetWorldToLocalMatrix() const;
-        // 获取逆世界变换矩阵
-        DirectX::XMMATRIX GetWorldToLocalMatrixXM() const;
-
-        // 设置对象缩放比例
-        void SetScale(const DirectX::XMFLOAT3& scale);
-        // 设置对象缩放比例
-        void SetScale(float x, float y, float z);
-
-        // 设置对象欧拉角(弧度制)
-        // 对象将以Z-X-Y轴顺序旋转
-        void SetRotation(const DirectX::XMFLOAT3& eulerAnglesInRadian);
-        // 设置对象欧拉角(弧度制)
-        // 对象将以Z-X-Y轴顺序旋转
-        void SetRotation(float x, float y, float z);
-
-        // 设置对象位置
-        void SetPosition(const DirectX::XMFLOAT3& position);
-        // 设置对象位置
-        void SetPosition(float x, float y, float z);
-
-        // 指定欧拉角旋转对象
-        void Rotate(const DirectX::XMFLOAT3& eulerAnglesInRadian);
-        // 指定以原点为中心绕轴旋转
-        void RotateAxis(const DirectX::XMFLOAT3& axis, float radian);
-        // 指定以point为旋转中心绕轴旋转
-        void RotateAround(const DirectX::XMFLOAT3& point, const DirectX::XMFLOAT3& axis, float radian);
-
-        // 沿着某一方向平移
-        void Translate(const DirectX::XMFLOAT3& direction, float magnitude);
-
-        // 观察某一点
-        void LookAt(const DirectX::XMFLOAT3& target, const DirectX::XMFLOAT3& up = { 0.0f, 1.0f, 0.0f });
-        // 沿着某一方向观察
-        void LookTo(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& up = { 0.0f, 1.0f, 0.0f });
-
-    private:
-        // 从旋转矩阵获取旋转欧拉角
-        DirectX::XMFLOAT3 GetEulerAnglesFromRotationMatrix(const DirectX::XMFLOAT4X4& rotationMatrix);
-
-    private:
-        DirectX::XMFLOAT3 mScale = { 1.0f, 1.0f, 1.0f };				// 缩放
-        DirectX::XMFLOAT3 mRotation = {};								// 旋转欧拉角(弧度制)
-        DirectX::XMFLOAT3 mPosition = {};								// 位置
-    };
-
-}
-
-using namespace CameraInternal;
+enum class CameraType{
+    FirstPersonCameraType, ThirdPersonCameraType
+};
 
 class Camera {
 public:
@@ -155,6 +59,9 @@ public:
     // 设置视口
     void SetViewPort(const D3D11_VIEWPORT& viewPort);
     void SetViewPort(float topLeftX, float topLeftY, float width, float height, float minDepth = 0.0f, float maxDepth = 1.0f);
+    
+    //相机类型信息
+    virtual CameraType type() = 0;
 
 protected:
 
@@ -197,6 +104,10 @@ public:
     // 正rad值向右观察
     // 负rad值向左观察
     void RotateY(float rad);
+
+    CameraType type() {
+        return CameraType::FirstPersonCameraType;
+    }
 };
 
 class ThirdPersonCamera : public Camera {
@@ -225,6 +136,9 @@ public:
     // 设置最小最大允许距离
     void SetDistanceMinMax(float minDist, float maxDist);
 
+    CameraType type() {
+        return CameraType::ThirdPersonCameraType;
+    }
 private:
     DirectX::XMFLOAT3 m_Target = {};
     float m_Distance = 0.0f;

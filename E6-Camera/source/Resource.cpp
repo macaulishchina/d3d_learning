@@ -4,8 +4,39 @@
 
 using namespace DirectX;
 
-ResourceController::ResourceController(D3DApp* app)
-    :mApp(app) {
+ResourceController::ResourceController(D3DApp* app) :
+    mModelChanged(true),
+    mCameraChanged(true),
+    mMaterialChanged(true),
+    mDirLightChanged(true),
+    mPointLightChanged(true),
+    mSpotLightChanged(true),
+    mApp(app){
+    //mCamera = std::make_shared<FirstPersonCamera>();
+}
+
+bool ResourceController::InitEffect()
+{
+    ComPtr<ID3DBlob> blob;
+    //编译并创建顶点着色器(3D)
+    HR(CreateShaderFromFile(L"hlsl\\Basic_VS_3D.cso", L"hlsl\\Basic_VS_3D.hlsl", "VS_3D", "vs_5_0", blob.ReleaseAndGetAddressOf()));
+    HR(mApp->mD3dDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, mVertexShader3D.GetAddressOf()));
+    //创建顶点布局并绑定到顶点着色器(3D)
+    HR(mApp->mD3dDevice->CreateInputLayout(DT::VertexPosNormalTex::inputLayout, ARRAYSIZE(DT::VertexPosNormalTex::inputLayout),
+        blob->GetBufferPointer(), blob->GetBufferSize(), mVertexLayout3D.GetAddressOf()));
+    // 编译并创建像素着色器
+    HR(CreateShaderFromFile(L"hlsl\\Basic_PS_3D.cso", L"hlsl\\Basic_PS_3D.hlsl", "PS_3D", "ps_5_0", blob.ReleaseAndGetAddressOf()));
+    HR(mApp->mD3dDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, mPixelShader3D.GetAddressOf()));
+    // 将着色器绑定到渲染管线
+    mApp->mD3dImmediateContext->VSSetShader(mVertexShader3D.Get(), nullptr, 0);
+    mApp->mD3dImmediateContext->PSSetShader(mPixelShader3D.Get(), nullptr, 0);
+    mApp->mD3dImmediateContext->IASetInputLayout(mVertexLayout3D.Get());
+
+    D3D11SetDebugObjectName(mVertexShader3D.Get(), "VS_3D");
+    D3D11SetDebugObjectName(mPixelShader3D.Get(), "PS_3D");
+    D3D11SetDebugObjectName(mVertexLayout3D.Get(), "VertexLayout3D");
+
+    return true;
 }
 
 void ResourceController::InitBuffer() {
@@ -91,78 +122,78 @@ void ResourceController::InitBuffer() {
     D3D11SetDebugObjectName(mConstBuffers[4].Get(), "PSPointLightBuffer");
     D3D11SetDebugObjectName(mConstBuffers[5].Get(), "PSSpotLightBuffer");
 
+    //test
+    //mCamera->SetViewPort(0.0f, 0.0f, (float)mApp->mClientWidth, (float)mApp->mClientHeight);
+    //mCamera->SetFrustum(XM_PI / 3, mApp->AspectRatio(), 0.5f, 1000.0f);
+    //mCamera->LookAt(XMFLOAT3(), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+    //SetProj(mCamera->GetViewProjXM());
 }
 
-void ResourceController::setModel(const DirectX::XMMATRIX& model) {
-    mModelChanged = true;
-    mModelBuffer.model = XMMatrixTranspose(model);
-    mModelBuffer.adjustNormal = XMMatrixInverse(nullptr, model);
-}
 
-void ResourceController::setView(const DirectX::XMMATRIX& view) {
-    mCameraChanged = true;
-    mCameraBuffer.view = view;
-}
+//void ResourceController::SetView(const DirectX::XMMATRIX& view) {
+//    mCameraChanged = true;
+//    mCameraBuffer.view = XMMatrixTranspose(view);
+//}
+//
+//void ResourceController::SetProj(const DirectX::XMMATRIX& proj) {
+//    mCameraChanged = true;
+//    mCameraBuffer.proj = XMMatrixTranspose(proj);
+//}
+//
+//void ResourceController::SetEyePosition(const DirectX::XMFLOAT3& position) {
+//    mCameraChanged = true;
+//    mCameraBuffer.eyePos = position;
+//}
 
-void ResourceController::setProj(const DirectX::XMMATRIX& proj) {
-    mCameraChanged = true;
-    mCameraBuffer.proj = proj;
-}
-
-void ResourceController::setEyePosition(const DirectX::XMFLOAT3& position) {
-    mCameraChanged = true;
-    mCameraBuffer.eyePos = position;
-}
-
-inline DirectX::XMMATRIX ResourceController::getModel() const {
+inline DirectX::XMMATRIX ResourceController::GetModel() const {
     return mModelBuffer.model;
 }
 
-inline DirectX::XMMATRIX ResourceController::getView() const {
-    return mCameraBuffer.view;
-}
+//inline DirectX::XMMATRIX ResourceController::GetView() const {
+//    return mCameraBuffer.view;
+//}
+//
+//inline DirectX::XMMATRIX ResourceController::GetProj() const {
+//    return mCameraBuffer.proj;
+//}
+//
+//inline DirectX::XMFLOAT3 ResourceController::GetEyePosition() const {
+//    return mCameraBuffer.eyePos;
+//}
 
-inline DirectX::XMMATRIX ResourceController::getProj() const {
-    return mCameraBuffer.proj;
-}
-
-inline DirectX::XMFLOAT3 ResourceController::getEyePosition() const {
-    return mCameraBuffer.eyePos;
-}
-
-void ResourceController::setMaterialAmbient(const DirectX::XMFLOAT4& ambient) {
+void ResourceController::SetMaterialAmbient(const DirectX::XMFLOAT4& ambient) {
     mMaterialChanged = true;
     mMaterialBuffer.material.ambient = ambient;
 }
 
-void ResourceController::setMaterialDiffuse(const DirectX::XMFLOAT4& diffuse) {
+void ResourceController::SetMaterialDiffuse(const DirectX::XMFLOAT4& diffuse) {
     mMaterialChanged = true;
     mMaterialBuffer.material.diffuse = diffuse;
 }
 
-void ResourceController::setMaterialSpecular(const DirectX::XMFLOAT4& specular) {
+void ResourceController::SetMaterialSpecular(const DirectX::XMFLOAT4& specular) {
     mMaterialChanged = true;
     mMaterialBuffer.material.specular = specular;
 }
 
-void ResourceController::setMaterialReflect(const DirectX::XMFLOAT4& reflect) {
+void ResourceController::SetMaterialReflect(const DirectX::XMFLOAT4& reflect) {
     mMaterialChanged = true;
     mMaterialBuffer.material.reflect = reflect;
 }
 
-inline DirectX::XMFLOAT4 ResourceController::getMaterialAmbient() const {
+DirectX::XMFLOAT4 ResourceController::GetMaterialAmbient() const {
     return mMaterialBuffer.material.ambient;
 }
 
-inline DirectX::XMFLOAT4 ResourceController::getMaterialDiffuse() const {
+DirectX::XMFLOAT4 ResourceController::GetMaterialDiffuse() const {
     return mMaterialBuffer.material.diffuse;
 }
 
-inline DirectX::XMFLOAT4 ResourceController::getMaterialSpecular() const {
+DirectX::XMFLOAT4 ResourceController::GetMaterialSpecular() const {
     return mMaterialBuffer.material.specular;
 }
 
-inline DirectX::XMFLOAT4 ResourceController::getMaterialReflect() const {
+DirectX::XMFLOAT4 ResourceController::GetMaterialReflect() const {
     return mMaterialBuffer.material.reflect;
 }
 
@@ -193,33 +224,40 @@ inline DirectX::XMFLOAT4 ResourceController::getMaterialReflect() const {
 //
 //}
 
-void ResourceController::deleteLight(std::string name) {
+void ResourceController::DeleteLight(std::string name) {
 }
 
 
-void ResourceController::update() {
+void ResourceController::Update() {
     D3D11_MAPPED_SUBRESOURCE mappedData;
-    HR(mApp->mD3dImmediateContext->Map(mConstBuffers[0].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::CBModelLocation), &mModelBuffer, sizeof(DT::CBModelLocation));
-    mApp->mD3dImmediateContext->Unmap(mConstBuffers[0].Get(), 0);
-
-    HR(mApp->mD3dImmediateContext->Map(mConstBuffers[1].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::CBCamera), &mCameraBuffer, sizeof(DT::CBCamera));
-    mApp->mD3dImmediateContext->Unmap(mConstBuffers[1].Get(), 0);
-
-    HR(mApp->mD3dImmediateContext->Map(mConstBuffers[2].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::CBMaterial), &mMaterialBuffer, sizeof(DT::CBMaterial));
-    mApp->mD3dImmediateContext->Unmap(mConstBuffers[2].Get(), 0);
-
-    HR(mApp->mD3dImmediateContext->Map(mConstBuffers[3].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::CBDirLight), &mDirLightBuffer, sizeof(DT::CBDirLight));
-    mApp->mD3dImmediateContext->Unmap(mConstBuffers[3].Get(), 0);
-
-    HR(mApp->mD3dImmediateContext->Map(mConstBuffers[4].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::CBPointLight), &mPointLightBuffer, sizeof(DT::CBPointLight));
-    mApp->mD3dImmediateContext->Unmap(mConstBuffers[4].Get(), 0);
-
-    HR(mApp->mD3dImmediateContext->Map(mConstBuffers[5].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::CBSpotLight), &mSpotLightBuffer, sizeof(DT::CBSpotLight));
-    mApp->mD3dImmediateContext->Unmap(mConstBuffers[5].Get(), 0);
+    if (mModelChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[0].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBModelLocation), &mModelBuffer, sizeof(DT::CBModelLocation));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[0].Get(), 0);
+    }
+    if (mCameraChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[1].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBCamera), &mCameraBuffer, sizeof(DT::CBCamera));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[1].Get(), 0);
+    }
+    if (mMaterialChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[2].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBMaterial), &mMaterialBuffer, sizeof(DT::CBMaterial));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[2].Get(), 0);
+    }
+    if (mDirLightChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[3].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBDirLight), &mDirLightBuffer, sizeof(DT::CBDirLight));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[3].Get(), 0);
+    }
+    if (mPointLightChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[4].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBPointLight), &mPointLightBuffer, sizeof(DT::CBPointLight));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[4].Get(), 0);
+    }
+    if (mSpotLightChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[5].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBSpotLight), &mSpotLightBuffer, sizeof(DT::CBSpotLight));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[5].Get(), 0);
+    }
 }

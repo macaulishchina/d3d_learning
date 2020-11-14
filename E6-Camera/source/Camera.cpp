@@ -1,7 +1,7 @@
 #include "Camera.h"
+#include "Transform.h"
 
 using namespace DirectX;
-using namespace CameraInternal;
 
 Camera::~Camera() {
 }

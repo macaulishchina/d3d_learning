@@ -216,6 +216,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\GameObject.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\d3dApp.h" />
     <ClInclude Include="include\d3dUtil.h" />
@@ -227,10 +228,12 @@
     <ClInclude Include="include\GameTimer.h" />
     <ClInclude Include="include\Keyboard.h" />
     <ClInclude Include="include\Mouse.h" />
+    <ClInclude Include="include\Transform.h" />
     <ClInclude Include="include\WICTextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Camera.cpp" />
+    <ClCompile Include="source\GameObject.cpp" />
     <ClCompile Include="source\Resource.cpp" />
     <ClCompile Include="source\d3dApp.cpp" />
     <ClCompile Include="source\d3dUtil.cpp" />
@@ -242,6 +245,7 @@
     <ClCompile Include="source\Keyboard.cpp" />
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\Mouse.cpp" />
+    <ClCompile Include="source\Transform.cpp" />
     <ClCompile Include="source\WICTextureLoader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

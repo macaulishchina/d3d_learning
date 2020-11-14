@@ -73,6 +73,12 @@
     <ClInclude Include="include\Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\Transform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Camera.cpp">
@@ -112,6 +118,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Resource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Transform.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GameObject.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
