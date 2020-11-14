@@ -10,6 +10,7 @@
 #include "GameTimer.h"
 #include "Mouse.h"
 #include "Keyboard.h"
+#include "Control.h"
 
 // 添加所有要引用的库
 #pragma comment(lib, "d2d1.lib")
@@ -59,6 +60,8 @@ protected:
 	bool	  mIsWireframeMode;	// 当前是否为线框模式
 
 	GameTimer mTimer;           // 计时器
+
+	friend class ResourceController;
 
 	// 使用模板别名(C++11)简化类型名
 	template <class T>

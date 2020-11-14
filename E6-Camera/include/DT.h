@@ -145,9 +145,11 @@ namespace DT {
         DirectX::XMFLOAT2 tex;
         static const D3D11_INPUT_ELEMENT_DESC inputLayout[4];
     };
-
+    enum class LightType {
+        AbstractLightType, DirectionalLightType, PointLightType, SpotLightType
+    };
     // 方向光
-    struct DirectionalLight {
+    struct DirectionalLight{
         DirectionalLight() = default;
 
         DirectionalLight(const DirectionalLight&) = default;
@@ -252,34 +254,34 @@ namespace DT {
     };
 
 
-    struct ModelLocationBuffer {
+    struct CBModelLocation {
         DirectX::XMMATRIX model;
         DirectX::XMMATRIX adjustNormal;
     };
 
-    struct CameraBuffer {
+    struct CBCamera {
         DirectX::XMMATRIX view;
         DirectX::XMMATRIX proj;
-        DirectX::XMFLOAT4 eyePos;
+        DirectX::XMFLOAT3 eyePos;
     };
 
-    struct MaterialBuffer {
+    struct CBMaterial {
         Material material;
     };
 
-    struct DirLightBuffer {
+    struct CBDirLight {
         DirectionalLight dirLight[10];
         int numDirLight;
         int padding[3];
     };
 
-    struct PointLightBuffer {
+    struct CBPointLight {
         PointLight pointLight[10];
         int numPointLight;
         int padding[3];
     };
 
-    struct SpotLightBuffer {
+    struct CBSpotLight {
         SpotLight spotLight[10];
         int numSpotLight;
         int padding[3];

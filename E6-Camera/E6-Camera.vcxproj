@@ -207,6 +207,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Control.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\d3dApp.h" />
     <ClInclude Include="include\d3dUtil.h" />
@@ -221,6 +222,7 @@
     <ClInclude Include="include\WICTextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Control.cpp" />
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\d3dApp.cpp" />
     <ClCompile Include="source\d3dUtil.cpp" />

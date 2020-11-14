@@ -36,12 +36,12 @@ private:
     ComPtr<ID3D11VertexShader> mVertexShader3D;     // 3D顶点输入布局
     ComPtr<ID3D11PixelShader> mPixelShader3D;       // 3D像素着色器
 
-    DT::ModelLocationBuffer mModelBuffer;	    // 模型位置相关量
-    DT::CameraBuffer mCameraBuffer;	            // 视角相关量
-    DT::MaterialBuffer mMaterialBuffer;	        // 模型材质相关量
-    DT::DirLightBuffer mDirLightBuffer;	        // 平行光源相关量
-    DT::PointLightBuffer mPointLightBuffer;	    // 点光源相关量
-    DT::SpotLightBuffer mSpotLightBuffer;	    // 聚光灯源相关量
+    DT::CBModelLocation mModelBuffer;	    // 模型位置相关量
+    DT::CBCamera mCameraBuffer;	            // 视角相关量
+    DT::CBMaterial mMaterialBuffer;	        // 模型材质相关量
+    DT::CBDirLight mDirLightBuffer;	        // 平行光源相关量
+    DT::CBPointLight mPointLightBuffer;	    // 点光源相关量
+    DT::CBSpotLight mSpotLightBuffer;	    // 聚光灯源相关量
 
 };
 

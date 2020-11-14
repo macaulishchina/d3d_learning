@@ -59,17 +59,17 @@ bool GameApp::InitResource() {
     cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     //创建变量缓冲区
-    cbd.ByteWidth = sizeof(DT::ModelLocationBuffer);
+    cbd.ByteWidth = sizeof(DT::CBModelLocation);
     HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[0].GetAddressOf()));
-    cbd.ByteWidth = sizeof(DT::CameraBuffer);
+    cbd.ByteWidth = sizeof(DT::CBCamera);
     HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[1].GetAddressOf()));
-    cbd.ByteWidth = sizeof(DT::MaterialBuffer);
+    cbd.ByteWidth = sizeof(DT::CBMaterial);
     HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[2].GetAddressOf()));
-    cbd.ByteWidth = sizeof(DT::DirLightBuffer);
+    cbd.ByteWidth = sizeof(DT::CBDirLight);
     HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[3].GetAddressOf()));
-    cbd.ByteWidth = sizeof(DT::PointLightBuffer);
+    cbd.ByteWidth = sizeof(DT::CBPointLight);
     HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[4].GetAddressOf()));
-    cbd.ByteWidth = sizeof(DT::SpotLightBuffer);
+    cbd.ByteWidth = sizeof(DT::CBSpotLight);
     HR(mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[5].GetAddressOf()));
 
     // ###初始化纹理和采样器状态
@@ -104,11 +104,11 @@ bool GameApp::InitResource() {
     std::cout << D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT << std::endl;
     // 绑定缓存到对应寄存器
     mD3dImmediateContext->VSSetConstantBuffers(0, 1, mConstBuffers[0].GetAddressOf());
-    mD3dImmediateContext->VSGetConstantBuffers(1, 1, mConstBuffers[1].GetAddressOf());
-    mD3dImmediateContext->VSGetConstantBuffers(2, 1, mConstBuffers[2].GetAddressOf());
-    mD3dImmediateContext->VSGetConstantBuffers(3, 1, mConstBuffers[3].GetAddressOf());
-    mD3dImmediateContext->VSGetConstantBuffers(4, 1, mConstBuffers[4].GetAddressOf());
-    mD3dImmediateContext->VSGetConstantBuffers(5, 1, mConstBuffers[5].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(1, 1, mConstBuffers[1].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(2, 1, mConstBuffers[2].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(3, 1, mConstBuffers[3].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(4, 1, mConstBuffers[4].GetAddressOf());
+    mD3dImmediateContext->VSSetConstantBuffers(5, 1, mConstBuffers[5].GetAddressOf());
 
     mD3dImmediateContext->PSSetConstantBuffers(0, 1, mConstBuffers[0].GetAddressOf());
     mD3dImmediateContext->PSSetConstantBuffers(1, 1, mConstBuffers[1].GetAddressOf());
@@ -143,7 +143,7 @@ bool GameApp::InitScene() {
         XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
     ));
     mCameraBuffer.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f));
-    mCameraBuffer.eyePos = XMFLOAT4(0.0f, 0.0f, -5.0f, 0.0f);
+    mCameraBuffer.eyePos = XMFLOAT3(0.0f, 0.0f, -5.0f);
 
     // 初始化默认光照
     // 方向光
@@ -215,27 +215,27 @@ void GameApp::UpdateScene(float dt) {
 
     D3D11_MAPPED_SUBRESOURCE mappedData;
     HR(mD3dImmediateContext->Map(mConstBuffers[0].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::ModelLocationBuffer), &mModelBuffer, sizeof(DT::ModelLocationBuffer));
+    memcpy_s(mappedData.pData, sizeof(DT::CBModelLocation), &mModelBuffer, sizeof(DT::CBModelLocation));
     mD3dImmediateContext->Unmap(mConstBuffers[0].Get(), 0);
 
     HR(mD3dImmediateContext->Map(mConstBuffers[1].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::CameraBuffer), &mCameraBuffer, sizeof(DT::CameraBuffer));
+    memcpy_s(mappedData.pData, sizeof(DT::CBCamera), &mCameraBuffer, sizeof(DT::CBCamera));
     mD3dImmediateContext->Unmap(mConstBuffers[1].Get(), 0);
 
     HR(mD3dImmediateContext->Map(mConstBuffers[2].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::MaterialBuffer), &mMaterialBuffer, sizeof(DT::MaterialBuffer));
+    memcpy_s(mappedData.pData, sizeof(DT::CBMaterial), &mMaterialBuffer, sizeof(DT::CBMaterial));
     mD3dImmediateContext->Unmap(mConstBuffers[2].Get(), 0);
 
     HR(mD3dImmediateContext->Map(mConstBuffers[3].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::DirLightBuffer), &mDirLightBuffer, sizeof(DT::DirLightBuffer));
+    memcpy_s(mappedData.pData, sizeof(DT::CBDirLight), &mDirLightBuffer, sizeof(DT::CBDirLight));
     mD3dImmediateContext->Unmap(mConstBuffers[3].Get(), 0);
 
     HR(mD3dImmediateContext->Map(mConstBuffers[4].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::PointLightBuffer), &mPointLightBuffer, sizeof(DT::PointLightBuffer));
+    memcpy_s(mappedData.pData, sizeof(DT::CBPointLight), &mPointLightBuffer, sizeof(DT::CBPointLight));
     mD3dImmediateContext->Unmap(mConstBuffers[4].Get(), 0);
 
     HR(mD3dImmediateContext->Map(mConstBuffers[5].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
-    memcpy_s(mappedData.pData, sizeof(DT::SpotLightBuffer), &mSpotLightBuffer, sizeof(DT::SpotLightBuffer));
+    memcpy_s(mappedData.pData, sizeof(DT::CBSpotLight), &mSpotLightBuffer, sizeof(DT::CBSpotLight));
     mD3dImmediateContext->Unmap(mConstBuffers[5].Get(), 0);
 
     mD3dImmediateContext->DrawIndexed(mIndexCount, 0, 0);
