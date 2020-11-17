@@ -145,9 +145,6 @@ namespace DT {
         DirectX::XMFLOAT2 tex;
         static const D3D11_INPUT_ELEMENT_DESC inputLayout[4];
     };
-    enum class LightType {
-        AbstractLightType, DirectionalLightType, PointLightType, SpotLightType
-    };
     // 方向光
     struct DirectionalLight{
         DirectionalLight() = default;

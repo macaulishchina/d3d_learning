@@ -153,11 +153,11 @@ ThirdPersonCamera::~ThirdPersonCamera() {
 }
 
 XMFLOAT3 ThirdPersonCamera::GetTargetPosition() const {
-	return m_Target;
+	return mTarget;
 }
 
 float ThirdPersonCamera::GetDistance() const {
-	return m_Distance;
+	return mDistance;
 }
 
 void ThirdPersonCamera::RotateX(float rad) {
@@ -170,8 +170,8 @@ void ThirdPersonCamera::RotateX(float rad) {
 		rotation.x = XM_PI / 3;
 
 	mTransform.SetRotation(rotation);
-	mTransform.SetPosition(m_Target);
-	mTransform.Translate(mTransform.GetForwardAxis(), -m_Distance);
+	mTransform.SetPosition(mTarget);
+	mTransform.Translate(mTransform.GetForwardAxis(), -mDistance);
 }
 
 void ThirdPersonCamera::RotateY(float rad) {
@@ -179,20 +179,20 @@ void ThirdPersonCamera::RotateY(float rad) {
 	rotation.y = XMScalarModAngle(rotation.y + rad);
 
 	mTransform.SetRotation(rotation);
-	mTransform.SetPosition(m_Target);
-	mTransform.Translate(mTransform.GetForwardAxis(), -m_Distance);
+	mTransform.SetPosition(mTarget);
+	mTransform.Translate(mTransform.GetForwardAxis(), -mDistance);
 }
 
 void ThirdPersonCamera::Approach(float dist) {
-	m_Distance += dist;
+	mDistance += dist;
 	// 限制距离在[m_MinDist, m_MaxDist]之间
-	if (m_Distance < m_MinDist)
-		m_Distance = m_MinDist;
-	else if (m_Distance > m_MaxDist)
-		m_Distance = m_MaxDist;
+	if (mDistance < mMinDist)
+		mDistance = mMinDist;
+	else if (mDistance > mMaxDist)
+		mDistance = mMaxDist;
 
-	mTransform.SetPosition(m_Target);
-	mTransform.Translate(mTransform.GetForwardAxis(), -m_Distance);
+	mTransform.SetPosition(mTarget);
+	mTransform.Translate(mTransform.GetForwardAxis(), -mDistance);
 }
 
 void ThirdPersonCamera::SetRotationX(float rad) {
@@ -205,29 +205,29 @@ void ThirdPersonCamera::SetRotationX(float rad) {
 		rotation.x = XM_PI / 3;
 
 	mTransform.SetRotation(rotation);
-	mTransform.SetPosition(m_Target);
-	mTransform.Translate(mTransform.GetForwardAxis(), -m_Distance);
+	mTransform.SetPosition(mTarget);
+	mTransform.Translate(mTransform.GetForwardAxis(), -mDistance);
 }
 
 void ThirdPersonCamera::SetRotationY(float rad) {
 	XMFLOAT3 rotation = mTransform.GetRotation();
 	rotation.y = XMScalarModAngle(rad);
 	mTransform.SetRotation(rotation);
-	mTransform.SetPosition(m_Target);
-	mTransform.Translate(mTransform.GetForwardAxis(), -m_Distance);
+	mTransform.SetPosition(mTarget);
+	mTransform.Translate(mTransform.GetForwardAxis(), -mDistance);
 }
 
 void ThirdPersonCamera::SetTarget(const XMFLOAT3& target) {
-	m_Target = target;
+	mTarget = target;
 }
 
 void ThirdPersonCamera::SetDistance(float dist) {
-	m_Distance = dist;
+	mDistance = dist;
 }
 
 void ThirdPersonCamera::SetDistanceMinMax(float minDist, float maxDist) {
-	m_MinDist = minDist;
-	m_MaxDist = maxDist;
+	mMinDist = minDist;
+	mMaxDist = maxDist;
 }
 
 

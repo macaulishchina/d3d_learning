@@ -140,10 +140,10 @@ public:
         return CameraType::ThirdPersonCameraType;
     }
 private:
-    DirectX::XMFLOAT3 m_Target = {};
-    float m_Distance = 0.0f;
+    DirectX::XMFLOAT3 mTarget = {};
+    float mDistance = 0.0f;
     // 最小允许距离，最大允许距离
-    float m_MinDist = 0.0f, m_MaxDist = 0.0f;
+    float mMinDist = 0.0f, mMaxDist = 0.0f;
 };
 
 

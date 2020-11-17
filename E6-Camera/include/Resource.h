@@ -1,165 +1,212 @@
 #ifndef __RESOURCE_H__
 #define __RESOURCE_H__
 
-#include "DT.h"
 #include "Camera.h"
-#include "d3dApp.h"
+#include "DT.h"
 #include "GameObject.h"
+#include "Light.h"
+#include "d3dApp.h"
 
-#define CONST_BUFFER_NUMS 6
+#define CONST_BUFFER_TOTAL_NUMS 6
+#define CONST_BUFFER_MODEL_INDEX 0
+#define CONST_BUFFER_CAMERA_INDEX 1
+#define CONST_BUFFER_MATERIAL_INDEX 2
+#define CONST_BUFFER_DIRLIGHT_INDEX 3
+#define CONST_BUFFER_POINTLIGHT_INDEX 4
+#define CONST_BUFFER_SPOTLIGHT_INDEX 5
 #define DIRECTIONAL_LIGHT_NUMS 10
 #define POINT_LIGHT_NUMS 10
 #define SPOT_LIGHT_NUMS 10
-
-
+class ShaderManger;
+class LightManger;
+class CameraManger;
+class ObjectManger;
 /*
-    资源控制器
+资源控制器
+1. 着色器资源设置
+2. 光源资源管理
+3. 相机资源管理
+4. 模型资源管理
 */
 class ResourceController {
-public:
-    ResourceController(D3DApp* app);
+ public:
+  ResourceController(D3DApp* app)
+      : mApp(app),
+        mShaderManager(std::make_shared<ShaderManger>()),
+        mLightManger(std::make_shared<LightManger>()),
+        mCameraManger(std::make_shared<CameraManger>()),
+        mObjectManger(std::make_shared<ObjectManger>()) {
+    Init();
+  }
 
-    ~ResourceController() = default;
+  ~ResourceController() = default;
 
-    bool InitEffect();
+  /*
+    更新资源
+  */
+  void Update() {
+    mLightManger->Update();
+    mCameraManger->Update();
+    mObjectManger->Update();
+  }
 
-    void InitBuffer();
+  inline std::shared_ptr<LightManger> GetLightManger() const {
+    return mLightManger;
+  }
+  inline std::shared_ptr<CameraManger> GetCameraManger() const {
+    return mCameraManger;
+  }
+  inline std::shared_ptr<ObjectManger> GetObjectManger() const {
+    return mObjectManger;
+  }
 
-    void SetMaterialAmbient(const DirectX::XMFLOAT4& ambient);
-    void SetMaterialDiffuse(const DirectX::XMFLOAT4& diffuse);
-    void SetMaterialSpecular(const DirectX::XMFLOAT4& specular);
-    void SetMaterialReflect(const DirectX::XMFLOAT4& reflect);
+ private:
+  /*
+    必要的资源初始化操作
+  */
+  void Init();
 
-    DirectX::XMFLOAT4 GetMaterialAmbient() const;
-    DirectX::XMFLOAT4 GetMaterialDiffuse() const;
-    DirectX::XMFLOAT4 GetMaterialSpecular() const;
-    DirectX::XMFLOAT4 GetMaterialReflect() const;
+  D3DApp* mApp;
 
-    //添加或重置平行光源
-    bool SetDirectionalLight(const std::string& name, const DT::DirectionalLight& light);
-    //添加或重置点光源
-    bool SetPointLight(const std::string& name, const DT::DirectionalLight& light);
-    //添加或重置聚光光源
-    bool SetSpotLight(const std::string& name, const DT::DirectionalLight& light);
+  std::shared_ptr<ShaderManger> mShaderManager;
+  std::shared_ptr<LightManger> mLightManger;
+  std::shared_ptr<CameraManger> mCameraManger;
+  std::shared_ptr<ObjectManger> mObjectManger;
 
-    //包含平行光源
-    bool ContainDirectionalLight(const std::string& name) const;
-    //包含点光源
-    bool ContainPointLight(const std::string& name) const;
-    //包含聚光光源
-    bool ContainSpotLight(const std::string& name) const;
-
-    //获得平行光源信息副本，请确保光源存在
-    const DT::DirectionalLight& GetDirectionalLight(const std::string& name) const;
-    //获得点光源信息副本，请确保光源存在
-    const DT::DirectionalLight& GetPointLight(const std::string& name) const;
-    //获得聚光光源信息副本，请确保光源存在
-    const DT::DirectionalLight& GetSpotLight(const std::string& name) const;
-
-    //删除平行光源
-    void DeleteDirectionalLight(const std::string& name);
-    //删除点光源
-    void DeletePointLight(const std::string& name);
-    //删除聚光光源
-    void DeleteDirectionalLight(const std::string& name);
-
-
-    //添加或重置相机
-    void SetCamera(const std::string& name, const std::shared_ptr<Camera>& camera);
-    //获得相机对象指针
-    std::shared_ptr<Camera> GetCamera(const std::string& name) const;
-    //判断是否存在该相机
-    bool ContainCamera(const std::string& name) const;
-    //删除相机
-    bool DeleteCamera(const std::string& name);
-    //使用相机
-    bool UseCamera(const std::string& name);
-
-    //添加或重置模型
-    void SetGameObject(const std::string& name, const GameObject& object);
-    // 获取指定物体变换
-    Transform& GetTransform(const std::string& name);
-    // 获取指定物体变换
-    const Transform& GetTransform(const std::string& name) const;
-
-    //inline DirectX::XMMATRIX GetView() const;
-    //inline DirectX::XMMATRIX GetProj() const;
-    //inline DirectX::XMFLOAT3 GetEyePosition() const;
-
-
-    //void addOrUpdateLight(const std::string& name, const DT::AbstractLight& light);
-    //DT::AbstractLight getLight(std::string name) const;
-
-    void Update();
-
-private:
-
-    //void SetView(const DirectX::XMMATRIX& view);
-    //void SetProj(const DirectX::XMMATRIX& proj);
-    //void SetEyePosition(const DirectX::XMFLOAT3& position);
-
-    // 状态标志位
-    bool mModelChanged;
-    bool mCameraChanged;
-    bool mMaterialChanged;
-    bool mDirLightChanged;
-    bool mPointLightChanged;
-    bool mSpotLightChanged;
-
-    D3DApp* mApp;
-    template <class T>
-    using ComPtr = Microsoft::WRL::ComPtr<T>;
-    ComPtr<ID3D11Buffer> mConstBuffers[CONST_BUFFER_NUMS];	// 常量缓冲区
-    ComPtr<ID3D11InputLayout> mVertexLayout3D;              // 顶点输入布局
-    ComPtr<ID3D11VertexShader> mVertexShader3D;             // 3D顶点输入布局
-    ComPtr<ID3D11PixelShader> mPixelShader3D;               // 3D像素着色器
-
-    DT::CBModelLocation mModelBuffer = {};	                // 模型位置相关量
-    DT::CBCamera mCameraBuffer = {};	                    // 视角相关量
-    DT::CBMaterial mMaterialBuffer = {};	                // 模型材质相关量
-    //mutable std::map<std::string, DT::AbstractLight> mLights;   //光源容器
-    DT::CBDirLight mDirLightBuffer = {};	                    // 平行光源相关量
-    DT::CBPointLight mPointLightBuffer = {};	                // 点光源相关量
-    DT::CBSpotLight mSpotLightBuffer = {};	                // 聚光灯源相关量
-
-    //std::shared_ptr<FirstPersonCamera> mCamera;
+  template <class T>
+  using ComPtr = Microsoft::WRL::ComPtr<T>;
+  ComPtr<ID3D11Buffer> mConstBuffers[CONST_BUFFER_TOTAL_NUMS];  // 常量缓冲区
 };
 
-//class BaseResource
-//{
-//public:
-//    BaseResource();
-//    ~BaseResource();
-//
-//private:
-//
-//};
-//
-//class CameraResource :BaseResource {
-//public:
-//    CameraResource();
-//    ~CameraResource();
-//
-//private:
-//
-//};
-//
-//class LightResource :BaseResource {
-//public:
-//    LightResource();
-//    ~LightResource();
-//
-//private:
-//
-//};
-//
-//class ObjectResource :BaseResource {
-//public:
-//    ObjectResource();
-//    ~ObjectResource();
-//
-//private:
-//
-//};
+/*
+着色器管理器，主要完成着色器的编译和加载
+*/
+class ShaderManger {
+ public:
+  ShaderManger() = default;
+  ~ShaderManger() = default;
+
+  /*
+  编译并加载着色器
+  */
+  bool Init();
+
+ private:
+  template <class T>
+  using ComPtr = Microsoft::WRL::ComPtr<T>;
+  ComPtr<ID3D11InputLayout> mVertexLayout3D;   // 顶点输入布局
+  ComPtr<ID3D11VertexShader> mVertexShader3D;  // 3D顶点输入布局
+  ComPtr<ID3D11PixelShader> mPixelShader3D;    // 3D像素着色器
+};
+
+/*
+光源管理器，负责多类型多数量光源的创建、更新、删除等
+*/
+class LightManger {
+ public:
+  LightManger() = default;
+  ~LightManger() = default;
+
+  /*
+  当光源数据改变时，修改相应的常量缓存区
+  */
+  void Update();
+
+  //添加或重置平行光源
+  bool SetDirectionalLight(const std::string& name,
+                           const std::shared_ptr<DirectionLightSource>& light);
+  //添加或重置点光源
+  bool SetPointLight(const std::string& name,
+                     const std::shared_ptr<PointLightSource>& light);
+  //添加或重置聚光光源
+  bool SetSpotLight(const std::string& name,
+                    const std::shared_ptr<SpotLightSource>& light);
+
+  //删除平行光源
+  bool DeleteDirectionalLight(const std::string& name);
+  //删除点光源
+  bool DeletePointLight(const std::string& name);
+  //删除聚光光源
+  bool DeleteDirectionalLight(const std::string& name);
+
+ private:
+  bool mDirLightChanged;
+  bool mPointLightChanged;
+  bool mSpotLightChanged;
+  std::map<std::string, UINT> mDirectionLightName2Index;
+  std::map<std::string, UINT> mPointLightName2Index;
+  std::map<std::string, UINT> mSpotLightName2Index;
+  std::map<std::string, std::shared_ptr<DirectionLightSource>> mDirLightSources;
+  std::map<std::string, std::shared_ptr<PointLightSource>> mPointLightSources;
+  std::map<std::string, std::shared_ptr<SpotLightSource>> mSpotLightSources;
+
+  // 平行光源相关量
+  UINT mDirLightNum;
+  DT::CBDirLight mDirLightBuffers[DIRECTIONAL_LIGHT_NUMS] = {};
+  // 点光源相关量
+  UINT mPointLightNum;
+  DT::CBPointLight mPointLightBuffers[POINT_LIGHT_NUMS] = {};
+  // 聚光灯源相关量
+  UINT mSpotLightNum;
+  DT::CBSpotLight mSpotLightBuffers[SPOT_LIGHT_NUMS] = {};
+};
+
+/*
+摄像机管理器，负责相机的添加、切换等
+*/
+class CameraManger {
+ public:
+  CameraManger() = default;
+  ~CameraManger() = default;
+
+  /*
+    当视野相关举证可能发生变化时，更新相关常量缓冲区
+  */
+  void Update();
+
+  //添加或重置相机
+  void SetCamera(const std::string& name,
+                 const std::shared_ptr<Camera>& camera);
+
+  bool UseCamera(const std::string& name);
+
+  bool DeleteCmera(const std::string& name);
+
+ private:
+  bool mCameraChanged;
+  DT::CBCamera mCameraBuffer = {};  // 视角相关量
+};
+
+/*
+场景物品管理器，负责模型的添加、变动等
+*/
+class ObjectManger {
+ public:
+  ObjectManger() = default;
+  ~ObjectManger() = default;
+
+
+  void Update();
+
+  //添加或重置模型
+  void SetGameObject(const std::string& name, const GameObject& object);
+
+
+  void SetMaterialAmbient(const DirectX::XMFLOAT4& ambient);
+  void SetMaterialDiffuse(const DirectX::XMFLOAT4& diffuse);
+  void SetMaterialSpecular(const DirectX::XMFLOAT4& specular);
+  void SetMaterialReflect(const DirectX::XMFLOAT4& reflect);
+
+  const DirectX::XMFLOAT4& GetMaterialAmbient() const;
+  const DirectX::XMFLOAT4& GetMaterialDiffuse() const;
+  const DirectX::XMFLOAT4& GetMaterialSpecular() const;
+  const DirectX::XMFLOAT4& GetMaterialReflect() const;
+
+ private:
+  // 状态标志位
+  bool mModelChanged;
+  bool mMaterialChanged;
+  DT::CBModelLocation mModelBuffer = {};  // 模型位置相关量
+};
 
 #endif
