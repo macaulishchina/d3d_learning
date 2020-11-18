@@ -11,6 +11,7 @@
 #include "Mouse.h"
 #include "Keyboard.h"
 #include "Control.h"
+#include "GameObject.h"
 
 // 添加所有要引用的库
 #pragma comment(lib, "d2d1.lib")
@@ -62,6 +63,12 @@ protected:
 	GameTimer mTimer;           // 计时器
 
 	friend class ResourceController;
+	friend class ShaderManger;
+	friend class CameraManger;
+	friend class ObjectManger;
+	friend class LightManger;
+	friend class GameObject;
+
 
 	// 使用模板别名(C++11)简化类型名
 	template <class T>
@@ -100,6 +107,9 @@ protected:
 	std::unique_ptr<DirectX::Mouse::ButtonStateTracker> mMouseTracker;
 	std::unique_ptr<DirectX::Keyboard> mKeyboard;
 	std::unique_ptr<DirectX::Keyboard::KeyboardStateTracker> mKeyboardTracker;
+
+	ComPtr<ID3D11SamplerState> mSamplerState;				// 采样器状态
+
 };
 
 #endif // D3DAPP_H

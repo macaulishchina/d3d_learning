@@ -14,7 +14,9 @@
 //
 // 定义了一些顶点结构体、输入布局和其它常用数据结构
 //***************************************************************************************
-
+#define DIRECTIONAL_LIGHT_NUMS 10
+#define POINT_LIGHT_NUMS 10
+#define SPOT_LIGHT_NUMS 10
 namespace DT {
     struct VertexPos {
         VertexPos() = default;
@@ -267,19 +269,19 @@ namespace DT {
     };
 
     struct CBDirLight {
-        DirectionalLight dirLight[10];
+        DirectionalLight dirLight[DIRECTIONAL_LIGHT_NUMS];
         int numDirLight;
         int padding[3];
     };
 
     struct CBPointLight {
-        PointLight pointLight[10];
+        PointLight pointLight[POINT_LIGHT_NUMS];
         int numPointLight;
         int padding[3];
     };
 
     struct CBSpotLight {
-        SpotLight spotLight[10];
+        SpotLight spotLight[SPOT_LIGHT_NUMS];
         int numSpotLight;
         int padding[3];
     };

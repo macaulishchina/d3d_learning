@@ -1,9 +1,13 @@
 #include "Resource.h"
 #include "DXTrace.h"
 #include "d3dUtil.h"
+#include "DDSTextureLoader.h"
 
 using namespace DirectX;
 
+
+
+/*
 ResourceController::ResourceController(D3DApp* app) :
     mModelChanged(true),
     mCameraChanged(true),
@@ -261,3 +265,279 @@ void ResourceController::Update() {
         mApp->mD3dImmediateContext->Unmap(mConstBuffers[5].Get(), 0);
     }
 }
+
+*/
+
+bool ResourceController::Init() {
+    // ###初始化纹理和采样器状态
+    // 初始化采样器状态
+    D3D11_SAMPLER_DESC sampDesc;
+    ZeroMemory(&sampDesc, sizeof(sampDesc));
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    sampDesc.BorderColor[0] = 0.0f;
+    sampDesc.BorderColor[1] = 0.0f;
+    sampDesc.BorderColor[2] = 0.0f;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+    HR(mApp->mD3dDevice->CreateSamplerState(&sampDesc, mApp->mSamplerState.GetAddressOf()));
+    mApp->mD3dImmediateContext->PSSetSamplers(0, 1, mApp->mSamplerState.GetAddressOf());
+
+    // ###初始化光栅化状态
+    D3D11_RASTERIZER_DESC rasterizerDesc;
+    ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
+    rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+    rasterizerDesc.CullMode = mApp->mCULLRender ? D3D11_CULL_FRONT : D3D11_CULL_NONE;
+    rasterizerDesc.FrontCounterClockwise = false;
+    rasterizerDesc.DepthClipEnable = true;
+    HR(mApp->mD3dDevice->CreateRasterizerState(&rasterizerDesc, mApp->mRSWireframe.GetAddressOf()));
+
+    // 设置图元类型，设定输入布局
+    mApp->mD3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    D3D11SetDebugObjectName(mApp->mSamplerState.Get(), "SamplerState");
+
+    // 初始化木箱纹理
+    HR(CreateDDSTextureFromFile(mApp->mD3dDevice.Get(), L"..\\Texture\\WoodCrate.dds", nullptr, mWoodCrate.GetAddressOf()));
+    // 像素着色阶段设置好采样器
+    mApp->mD3dImmediateContext->PSSetShaderResources(0, 1, mWoodCrate.GetAddressOf());
+
+    return true;
+}
+
+ShaderManger::ShaderManger(D3DApp* app) :mApp(app) {
+
+}
+
+bool ShaderManger::Init() {
+    ComPtr<ID3DBlob> blob;
+    //编译并创建顶点着色器(3D)
+    HR(CreateShaderFromFile(L"hlsl\\Basic_VS_3D.cso", L"hlsl\\Basic_VS_3D.hlsl", "VS_3D", "vs_5_0", blob.ReleaseAndGetAddressOf()));
+    HR(mApp->mD3dDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, mVertexShader3D.GetAddressOf()));
+    //创建顶点布局并绑定到顶点着色器(3D)
+    HR(mApp->mD3dDevice->CreateInputLayout(DT::VertexPosNormalTex::inputLayout, ARRAYSIZE(DT::VertexPosNormalTex::inputLayout),
+        blob->GetBufferPointer(), blob->GetBufferSize(), mVertexLayout3D.GetAddressOf()));
+    // 编译并创建像素着色器
+    HR(CreateShaderFromFile(L"hlsl\\Basic_PS_3D.cso", L"hlsl\\Basic_PS_3D.hlsl", "PS_3D", "ps_5_0", blob.ReleaseAndGetAddressOf()));
+    HR(mApp->mD3dDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, mPixelShader3D.GetAddressOf()));
+    // 将着色器绑定到渲染管线
+    mApp->mD3dImmediateContext->VSSetShader(mVertexShader3D.Get(), nullptr, 0);
+    mApp->mD3dImmediateContext->PSSetShader(mPixelShader3D.Get(), nullptr, 0);
+    mApp->mD3dImmediateContext->IASetInputLayout(mVertexLayout3D.Get());
+
+    D3D11SetDebugObjectName(mVertexShader3D.Get(), "VS_3D");
+    D3D11SetDebugObjectName(mPixelShader3D.Get(), "PS_3D");
+    D3D11SetDebugObjectName(mVertexLayout3D.Get(), "VertexLayout3D");
+
+    return true;
+}
+
+
+void LightManger::Init() {
+    // ###设置常量缓冲区描述
+    D3D11_BUFFER_DESC cbd;
+    ZeroMemory(&cbd, sizeof(cbd));
+    cbd.Usage = D3D11_USAGE_DYNAMIC;
+    cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    //创建变量缓冲区
+    cbd.ByteWidth = sizeof(DT::CBDirLight);
+    HR(mApp->mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[0].GetAddressOf()));
+    cbd.ByteWidth = sizeof(DT::CBPointLight);
+    HR(mApp->mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[1].GetAddressOf()));
+    cbd.ByteWidth = sizeof(DT::CBSpotLight);
+    HR(mApp->mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[2].GetAddressOf()));
+    // 绑定缓存到对应寄存器
+    mApp->mD3dImmediateContext->PSSetConstantBuffers(CONST_BUFFER_DIRLIGHT_INDEX, 1, mConstBuffers[0].GetAddressOf());
+    mApp->mD3dImmediateContext->PSSetConstantBuffers(CONST_BUFFER_POINTLIGHT_INDEX, 1, mConstBuffers[1].GetAddressOf());
+    mApp->mD3dImmediateContext->PSSetConstantBuffers(CONST_BUFFER_SPOTLIGHT_INDEX, 1, mConstBuffers[2].GetAddressOf());
+
+    // 设置调试对象名
+    D3D11SetDebugObjectName(mConstBuffers[0].Get(), "PSDirLightBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[1].Get(), "PSPointLightBuffer");
+    D3D11SetDebugObjectName(mConstBuffers[2].Get(), "PSSpotLightBuffer");
+}
+
+
+LightManger::LightManger(D3DApp* app) :mApp(app) {
+    Init();
+}
+
+void LightManger::Update() {
+    D3D11_MAPPED_SUBRESOURCE mappedData;
+
+    if (mDirLightChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[0].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBDirLight), &mDirLightBuffers, sizeof(DT::CBDirLight));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[0].Get(), 0);
+        mDirLightChanged = false;
+    }
+    if (mPointLightChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[1].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBPointLight), &mPointLightBuffers, sizeof(DT::CBPointLight));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[1].Get(), 0);
+        mPointLightChanged = false;
+    }
+    if (mSpotLightChanged) {
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[2].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBSpotLight), &mSpotLightBuffers, sizeof(DT::CBSpotLight));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[2].Get(), 0);
+        mSpotLightChanged = false;
+    }
+
+}
+
+bool LightManger::SetDirectionalLight(const std::string& name, const std::shared_ptr<DirectionLightSource>& light)
+{
+    auto found = mDirectionLightName2Index.find(name);
+    if (found != mDirectionLightName2Index.end()) {
+        mDirLightBuffers.dirLight[found->second] = light->getLightData();
+    }
+    else {
+        assert(mDirLightBuffers.numDirLight < DIRECTIONAL_LIGHT_NUMS);
+        mDirLightBuffers.dirLight[mDirLightBuffers.numDirLight] = light->getLightData();
+        mDirectionLightName2Index[name] = mDirLightBuffers.numDirLight++;
+    }
+    mDirLightChanged = true;
+    return true;
+}
+
+bool LightManger::SetPointLight(const std::string& name, const std::shared_ptr<PointLightSource>& light)
+{
+    auto found = mPointLightName2Index.find(name);
+    if (found != mPointLightName2Index.end()) {
+        mPointLightBuffers.pointLight[found->second] = light->getLightData();
+    }
+    else {
+        assert(mPointLightBuffers.numPointLight < POINT_LIGHT_NUMS);
+        mPointLightBuffers.pointLight[mPointLightBuffers.numPointLight] = light->getLightData();
+        mPointLightName2Index[name] = mPointLightBuffers.numPointLight++;
+    }
+    mPointLightChanged = true;
+    return true;
+}
+
+bool LightManger::SetSpotLight(const std::string& name, const std::shared_ptr<SpotLightSource>& light)
+{
+    auto found = mSpotLightName2Index.find(name);
+    if (found != mSpotLightName2Index.end()) {
+        mSpotLightBuffers.spotLight[found->second] = light->getLightData();
+    }
+    else {
+        assert(mSpotLightBuffers.numSpotLight < POINT_LIGHT_NUMS);
+        mSpotLightBuffers.spotLight[mSpotLightBuffers.numSpotLight] = light->getLightData();
+        mSpotLightName2Index[name] = mSpotLightBuffers.numSpotLight++;
+    }
+    mSpotLightChanged = true;
+    return true;
+}
+
+bool LightManger::DeleteDirectionalLight(const std::string& name)
+{
+    return false;
+}
+
+bool LightManger::DeletePointLight(const std::string& name)
+{
+    return false;
+}
+
+bool LightManger::DeleteSpotLight(const std::string& name)
+{
+    return false;
+}
+
+void CameraManger::Init() {
+    // ###设置常量缓冲区描述
+    D3D11_BUFFER_DESC cbd;
+    ZeroMemory(&cbd, sizeof(cbd));
+    cbd.Usage = D3D11_USAGE_DYNAMIC;
+    cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    //创建变量缓冲区
+    cbd.ByteWidth = sizeof(DT::CBCamera);
+    HR(mApp->mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[0].GetAddressOf()));
+}
+
+CameraManger::CameraManger(D3DApp* app) :mApp(app) {
+    Init();
+}
+
+void CameraManger::Update() {
+    if (mCameraChanged && mCameras.find(mUsing) != mCameras.end()) {
+        mCameraBuffer.eyePos = mCameras[mUsing]->GetPosition();
+        mCameraBuffer.view = mCameras[mUsing]->GetViewXM();
+        mCameraBuffer.proj = mCameras[mUsing]->GetProjXM();
+        D3D11_MAPPED_SUBRESOURCE mappedData;
+        HR(mApp->mD3dImmediateContext->Map(mConstBuffers[0].Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData));
+        memcpy_s(mappedData.pData, sizeof(DT::CBCamera), &mCameraBuffer, sizeof(DT::CBCamera));
+        mApp->mD3dImmediateContext->Unmap(mConstBuffers[0].Get(), 0);
+        mCameraChanged = false;
+    }
+}
+
+void CameraManger::SetCamera(const std::string& name, const std::shared_ptr<Camera>& camera) {
+    mCameras[name] = camera;
+    mCameraChanged = (name == mUsing);
+}
+
+bool CameraManger::UseCamera(const std::string& name) {
+    if (mCameras.find(name) == mCameras.end()) {
+        return false;
+    }
+    else {
+        mCameraChanged = true;
+        mUsing = name;
+        return true;
+    }
+}
+
+bool CameraManger::DeleteCmera(const std::string& name)
+{
+    return false;
+}
+
+ObjectManger::ObjectManger(D3DApp* app) :mApp(app) {
+    Init();
+}
+
+void ObjectManger::Update(){
+    for (auto it : mObjects) {
+        it.second->Draw(mApp->mD3dImmediateContext.Get());
+    }
+}
+
+void ObjectManger::SetGameObject(const std::string& name, const std::shared_ptr<GameObject>& object){
+    mObjects[name] = object;
+}
+
+bool ObjectManger::SetVisable(const std::string& name, bool flag){
+    if (mObjects.find(name) == mObjects.end()) {
+        return false;
+    }
+    else {
+        mObjects[name]->SetVisable(flag);
+    }
+}
+
+bool ObjectManger::DeleteGameObject(const std::string& name)
+{
+    return false;
+}
+
+void ObjectManger::Init(){
+    // ###设置常量缓冲区描述
+    D3D11_BUFFER_DESC cbd;
+    ZeroMemory(&cbd, sizeof(cbd));
+    cbd.Usage = D3D11_USAGE_DYNAMIC;
+    cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    //创建变量缓冲区
+    cbd.ByteWidth = sizeof(DT::CBModelLocation);
+    HR(mApp->mD3dDevice->CreateBuffer(&cbd, nullptr, mConstBuffers[0].GetAddressOf()));
+    mApp->mD3dImmediateContext->VSSetConstantBuffers(CONST_BUFFER_MODEL_INDEX, 1, mConstBuffers[0].GetAddressOf());
+}
+

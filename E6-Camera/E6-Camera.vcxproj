@@ -218,7 +218,6 @@
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\GameObject.h" />
     <ClInclude Include="include\Light.h" />
-    <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\Resource.h" />
     <ClInclude Include="include\d3dApp.h" />
     <ClInclude Include="include\d3dUtil.h" />
@@ -236,6 +235,7 @@
   <ItemGroup>
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
+    <ClCompile Include="source\Light.cpp" />
     <ClCompile Include="source\Manager.cpp" />
     <ClCompile Include="source\Resource.cpp" />
     <ClCompile Include="source\d3dApp.cpp" />

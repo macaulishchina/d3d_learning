@@ -11,8 +11,8 @@ enum class CameraType{
 
 class Camera {
 public:
-    Camera() = delete;
-    virtual ~Camera() = 0;
+    Camera() = default;
+    virtual ~Camera() = default;
 
     //
     // 获取摄像机位置

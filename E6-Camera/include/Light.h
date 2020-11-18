@@ -9,62 +9,71 @@
 enum class LightType { DirectionLightType, PointLightType, SpotLightType };
 
 class LightSource {
- public:
-  LightSource() = delete;
-  virtual ~LightSource() = 0;
+public:
+    LightSource() = default;
+    ~LightSource() = default;
 
-  //
-  // ªÒ»°π‚‘¥Œª÷√
-  //
+    //
+    // Ëé∑ÂèñÂÖâÊ∫ê‰ΩçÁΩÆ
+    //
 
-  DirectX::XMVECTOR GetPositionXM() const;
-  DirectX::XMFLOAT3 GetPosition() const;
+    inline DirectX::XMVECTOR GetPositionXM() const {
+        return mTransform.GetPositionXM();
+    }
+    inline DirectX::XMFLOAT3 GetPosition() const {
+        return mTransform.GetPosition();
+    }
 
-  //π‚‘¥¿‡–Õ–≈œ¢
-  virtual LightType type() const = 0;
-  //…˙–ßπ‚‘¥∏ƒ±‰
-  virtual void Update();
+    //ÂÖâÊ∫êÁ±ªÂûã‰ø°ÊÅØ
+    virtual LightType type() const = 0;
 
- protected:
-  // π‚‘¥µƒ±‰ªª
-  Transform mTransform = {};
+
+protected:
+    // ÂÖâÊ∫êÁöÑÂèòÊç¢
+    Transform mTransform = {};
 };
 
 class DirectionLightSource : LightSource {
- public:
-  DirectionLightSource();
-  ~DirectionLightSource() = default;
+public:
+    DirectionLightSource() = default;
+    ~DirectionLightSource() = default;
 
-  LightType type() const { return LightType::DirectionLightType; }
+    LightType type() const { return LightType::DirectionLightType; }
 
-  DT::DirectionalLight& getLightData() const;
+    inline const DT::DirectionalLight& getLightData() const {
+        return mDirectionalLight;
+    }
 
- private:
-  DT::DirectionalLight mDirectionalLight;
+//private:
+    DT::DirectionalLight mDirectionalLight;
 };
 
 class PointLightSource : LightSource {
- public:
-  PointLightSource();
-  ~PointLightSource() = default;
+public:
+    PointLightSource() = default;
+    ~PointLightSource() = default;
 
-  LightType type() const { return LightType::PointLightType; }
+    LightType type() const { return LightType::PointLightType; }
 
-  DT::PointLight& getLightData() const;
+    inline const DT::PointLight& getLightData() const {
+        return mPointLight;
+    }
 
- private:
-  DT::PointLight mPointLight;
+//private:
+    DT::PointLight mPointLight;
 };
 
 class SpotLightSource : LightSource {
- public:
-  SpotLightSource();
-  ~SpotLightSource() = default;
-  LightType type() const { return LightType::SpotLightType; }
+public:
+    SpotLightSource() = default;
+    ~SpotLightSource() = default;
+    LightType type() const { return LightType::SpotLightType; }
 
-  DT::SpotLight& getLightData() const;
+    inline const DT::SpotLight& getLightData() const {
+        return mSpotLight;
+    }
 
- private:
-  DT::SpotLight mSpotLight;
+//private:
+    DT::SpotLight mSpotLight;
 };
 #endif

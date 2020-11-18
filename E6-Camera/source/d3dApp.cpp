@@ -8,14 +8,14 @@ namespace
     // This is just used to forward Windows messages from a global window
     // procedure to our member function window procedure because we cannot
     // assign a member function to WNDCLASS::lpfnWndProc.
-    D3DApp* g_pd3dApp = nullptr;
+    D3DApp* gD3dApp = nullptr;
 }
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     // Forward hwnd on because we can get messages (e.g., WM_CREATE)
     // before CreateWindow returns, and thus before m_hMainWnd is valid.
-    return g_pd3dApp->MsgProc(hwnd, msg, wParam, lParam);
+    return gD3dApp->MsgProc(hwnd, msg, wParam, lParam);
 }
 
 D3DApp::D3DApp(HINSTANCE hInstance)
@@ -40,10 +40,10 @@ D3DApp::D3DApp(HINSTANCE hInstance)
     mDepthStencilView(nullptr) {
     ZeroMemory(&mScreenViewport, sizeof(D3D11_VIEWPORT));
 
-
     // 让一个全局指针获取这个类，这样我们就可以在Windows消息处理的回调函数
     // 让这个类调用内部的回调函数了
-    g_pd3dApp = this;
+    gD3dApp = this;
+    D3DApp::Init();
 }
 
 D3DApp::~D3DApp() {
@@ -452,9 +452,6 @@ bool D3DApp::InitDirect3D() {
     mD3dDevice->CheckMultisampleQualityLevels(
         DXGI_FORMAT_B8G8R8A8_UNORM, 4, &m4xMsaaQuality);
     assert(m4xMsaaQuality > 0);
-
-
-
 
     ComPtr<IDXGIDevice> dxgiDevice = nullptr;
     ComPtr<IDXGIAdapter> dxgiAdapter = nullptr;
