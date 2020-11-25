@@ -235,8 +235,6 @@
   <ItemGroup>
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\GameObject.cpp" />
-    <ClCompile Include="source\Light.cpp" />
-    <ClCompile Include="source\Manager.cpp" />
     <ClCompile Include="source\Resource.cpp" />
     <ClCompile Include="source\d3dApp.cpp" />
     <ClCompile Include="source\d3dUtil.cpp" />

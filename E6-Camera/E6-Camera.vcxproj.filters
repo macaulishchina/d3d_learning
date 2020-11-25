@@ -129,11 +129,5 @@
     <ClCompile Include="source\Resource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Manager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Light.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

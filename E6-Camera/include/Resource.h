@@ -156,7 +156,7 @@ private:
 
     template <class T>
     using ComPtr = Microsoft::WRL::ComPtr<T>;
-    ComPtr<ID3D11Buffer> mConstBuffers[1];        // 常量缓冲区
+    ComPtr<ID3D11Buffer> mConstBuffers[2];        // 常量缓冲区
 
     D3DApp* mApp;
     std::map<std::string, std::shared_ptr<GameObject>> mObjects;

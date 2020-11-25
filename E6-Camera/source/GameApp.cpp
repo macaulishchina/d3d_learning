@@ -37,6 +37,10 @@ bool GameApp::InitScene() {
     obj->SetBuffer(mD3dDevice.Get(), Geometry::CreateBox());
     obj->SetTexture(mController.mWoodCrate.Get());
     obj->SetVisable();
+    obj->mMaterial.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+    obj->mMaterial.material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+    obj->mMaterial.material.specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 5.0f);
+    obj->mMaterial.material.reflect = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
     mController.GetObjectManger()->SetGameObject("test", obj);
     return true;
 }
@@ -59,9 +63,6 @@ void GameApp::UpdateScene(float dt) {
         mIsWireframeMode = !mIsWireframeMode;
         mD3dImmediateContext->RSSetState(mIsWireframeMode ? mRSWireframe.Get() : nullptr);
     }
-
-
-
 
     mController.Update();
 
@@ -89,11 +90,11 @@ void GameApp::Update2DScene() {
 void GameApp::DrawScene() {
     assert(mD3dImmediateContext);
     assert(mSwapChain);
-    static float bg[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // RGBA = (0,0,0,255)
+    static float bg[4] = { 0.3f, 0.3f, 0.3f, 1.0f };  // RGBA = (0,0,0,255)
     mD3dImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), bg);
     mD3dImmediateContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     UpdateScene(mTimer.DeltaTime());
-    //Update2DScene();
+    Update2DScene();
     HR(mSwapChain->Present(0, 0));
 }
 

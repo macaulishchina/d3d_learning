@@ -30,7 +30,8 @@ private:
     ComPtr<ID3D11Buffer> mGPUPSConstBuffer;	        // PS常量缓冲区
     UINT mIndexCount;                               // 索引量
 
-
+    ComPtr<ID3D11SamplerState> mSamplerState;     // 采样器状态
+    ComPtr<ID3D11ShaderResourceView> mWoodCrate;  // 木盒纹理
 
     ComPtr<ID3D11VertexShader> mVertexShader3D;     // 3D顶点输入布局
     ComPtr<ID3D11PixelShader> mPixelShader3D;       // 3D像素着色器
